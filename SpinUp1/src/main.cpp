@@ -24,6 +24,6 @@ int main() {
 
   //mecanum drive
   while(true){
-    y
+    Brain.Screen.print("goo goo");
   }
 }
