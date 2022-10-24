@@ -23,7 +23,7 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
-//seggs
+
 using namespace vex;
 
 // A global instance of competition
