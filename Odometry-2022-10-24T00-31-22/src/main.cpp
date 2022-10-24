@@ -26,6 +26,7 @@
 
 using namespace vex;
 
+// hello
 // A global instance of competition
 competition Competition;
 
