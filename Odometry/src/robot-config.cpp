@@ -18,6 +18,7 @@ motor R3 = motor(PORT20, ratio18_1, false);
 encoder LEncoder = encoder(Brain.ThreeWirePort.A);
 encoder REncoder = encoder(Brain.ThreeWirePort.C);
 encoder MEncoder = encoder(Brain.ThreeWirePort.E);
+inertial Inertial1 = inertial(PORT1);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

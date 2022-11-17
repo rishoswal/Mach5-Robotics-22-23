@@ -20,6 +20,7 @@
 // LEncoder             encoder       A, B            
 // REncoder             encoder       C, D            
 // MEncoder             encoder       E, F            
+// Inertial1            inertial      1               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -39,8 +40,8 @@ double RPrevPos;
 double RCurrentPos=0;
 double MPrevPos;
 double MCurrentPos = 0;
-double angle;
-double angleChange;
+double CurrentAngle;
+double PreviousAngle;
 double totalDistance;
 double fieldX;
 double fieldY;
@@ -48,7 +49,10 @@ double changeFieldX;
 double changeFieldY;
 double dR;
 double d;
+double dx;
+double dy;
 double dL;
+double dA;
 double dM;
 double wheelCircum = 2.75 * 3.1415 / 360;
 
@@ -58,14 +62,22 @@ void OdonTracking(){
     LPrevPos = LCurrentPos;
     RPrevPos = RCurrentPos;
     MPrevPos = MCurrentPos;
+    PreviousAngle = CurrentAngle;
+
+    LCurrentPos = LEncoder.position(degrees) * -1;
+    RCurrentPos = REncoder.position(degrees);
+    MCurrentPos = MEncoder.position(degrees);
+    CurrentAngle = Inertial1.heading(degrees) * 3.1415/180;
     
-    LCurrentPos = LEncoder.position(degrees) * 3.1415/180;
-    RCurrentPos = REncoder.position(degrees) * -1 * 3.1415/180;  
-    MCurrentPos = MEncoder.position(degrees) * 3.1415/180;
+
 
     dL = LCurrentPos - LPrevPos;
     dR = RCurrentPos - RPrevPos;
     dM = MCurrentPos - MPrevPos;
+    dA = CurrentAngle-PreviousAngle;
+
+    dx = wheelCircum * (dR + dL)/2;
+    dy = wheelCircum * 
 
     angleChange = ((dR - dL)/Rw) ;
     angle += angleChange;

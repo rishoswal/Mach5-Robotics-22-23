@@ -13,6 +13,7 @@ extern motor R3;
 extern encoder LEncoder;
 extern encoder REncoder;
 extern encoder MEncoder;
+extern inertial Inertial1;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
