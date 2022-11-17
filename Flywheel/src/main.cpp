@@ -113,7 +113,8 @@ void Test(int startSpeed, int finalSpeed){
     counter += 20;
     wait(0.7, sec);
     Brain.Screen.clearLine();
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    //Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    Brain.Screen.print(Flywheel.voltage());
   }
   Flywheel.spin(forward);
 }

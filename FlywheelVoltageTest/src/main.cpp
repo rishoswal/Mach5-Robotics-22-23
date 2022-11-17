@@ -24,31 +24,34 @@ int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  int volts = 0;
+  float volts = 0;
   double heat;
+
   while(true){
-    if(Controller1.ButtonRight.pressing()&&volts<5){
-      volts++;
+    if(Controller1.ButtonRight.pressing()&&volts<11){
+      volts+=0.5;
     }
-    if(Controller1.ButtonLeft.pressing()&&volts>-5){
-      volts--;
+    if(Controller1.ButtonLeft.pressing()&&volts>0){
+      volts-=0.5;
     }
     if(Controller1.ButtonDown.pressing()){
       volts=0;
     }
+
+    // Generally, 7 to 10 volts is a good range for all distances on th field
     Flywheel.spin(forward, volts, volt);
 
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
     Brain.Screen.clearScreen();
-    Brain.Screen.printAt(25, 25, "%d", volts);
-    Brain.Screen.printAt(25, 40, "%f", Flywheel.voltage());
-    Brain.Screen.printAt(25, 55, "%f", Flywheel.power());
-    Brain.Screen.printAt(25, 70, "%f", Flywheel.torque());
-    Brain.Screen.printAt(25, 85, "%f", Flywheel.velocity(dps)*0.3142);
-    Brain.Screen.printAt(25, 100, "%f", Flywheel.efficiency());
-    Brain.Screen.printAt(25, 115, "%f", heat);
-    // Brain.Screen.printAt(25, 120, "%d", Flywheel.torque());
+    Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
+    Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.voltage());
+    Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.power());
+    Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
+    Brain.Screen.printAt(15, 85, "   AngularV: %f", Flywheel.velocity(dps)*0.3142);
+    Brain.Screen.printAt(15, 100, " Efficiency; %f", Flywheel.efficiency());
+    Brain.Screen.printAt(15, 115, "  Heat Loss: %f", heat);
+    Brain.Screen.printAt(15, 130, " Resistance: %f", Flywheel.voltage()/Flywheel.current());
 
     wait(100, msec);
   }
