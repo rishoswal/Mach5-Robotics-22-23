@@ -20,12 +20,59 @@ using namespace vex;
 
 // 1:1 motor spins 18x faster than a green catridge
 
+double kP = 0.03;
+double kI = 0.0;
+double kD = 0.003;
+
+int flySpeed;
+
+int counter = 0;
+int rotateSpeed = 1900;
+int error;
+int prevError;
+int derivative;
+int integral;
+int diff;
+int currSpeed;
+bool enableLogistic = false;
+float volts = 0;
+double heat;
+bool enableVisionPID = false;
+bool enableFlyPID = true;
+
+void FlyWheelPID() {
+  int i = 0;
+  while (enableFlyPID) {
+    diff = 0;
+    error = Flywheel.voltage()   - (volts-(volts*0.1));
+    derivative = error - prevError;
+    diff = (error * kP) + (derivative * kD);
+    prevError = error;
+    currSpeed = Flywheel.voltage() - diff;
+    if (Flywheel.voltage() < volts - 035){
+      Flywheel.spin(forward, volts, volt);
+    }
+    
+    // else {
+    //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
+    
+    Brain.Screen.clearLine();
+    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    /*Flywheel.setVelocity(rotateSpeed/6, rpm);
+    Flywheel.spin(forward);
+    Brain.Screen.clearLine();
+    Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
+    vex::task::sleep(10);
+    i++;
+  }
+}
+
+
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  float volts = 0;
-  double heat;
+  
 
   while(true){
     if(Controller1.ButtonRight.pressing()&&volts<11){
@@ -39,7 +86,8 @@ int main() {
     }
 
     // Generally, 7 to 10 volts is a good range for all distances on th field
-    Flywheel.spin(forward, volts, volt);
+    //Flywheel.spin(forward, volts, volt);
+    vex::task FlyWheelPID();
 
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
