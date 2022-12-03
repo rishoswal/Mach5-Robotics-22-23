@@ -40,7 +40,7 @@ double kD = 0.003;
 int flySpeed;
 
 int counter = 0;
-int rotateSpeed = 1900;
+int rotateSpeed = 2300;
 int error;
 int prevError;
 int derivative;
@@ -84,9 +84,9 @@ void motorRotate(double degreeLeft, double degreeRight) {
   //backRightMotor.startRotateFor(degreeRight, degrees);
   Motor17.startRotateFor(degreeRight, degrees);
   Motor12.startRotateFor(degreeRight, degrees);
-  Motor19.startRotateFor(degreeRight, degrees);
-  Motor18.startRotateFor(degreeRight, degrees);
-  Motor20.startRotateFor(degreeRight, degrees);
+  Motor19.startRotateFor(degreeLeft, degrees);
+  Motor18.startRotateFor(degreeLeft, degrees);
+  Motor20.rotateFor(degreeLeft, degrees);
   // wait(0.5, sec);
 }
 void inertialRotate(int heading){
@@ -168,6 +168,34 @@ int FlyWheelPID() {
   return(1);
 }
 
+int FlyWheelPIDRPM() {
+  int i = 0;
+  while (enableFlyPID) {
+    diff = 0;
+    error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
+    derivative = error - prevError;
+    diff = (error * kP) + (derivative * kD);
+    prevError = error;
+    currSpeed = Flywheel.velocity(rpm) - diff;
+    if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100){
+      Flywheel.spin(forward, currSpeed, rpm);
+    }
+    
+    // else {
+    //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
+    
+    //Brain.Screen.clearLine();
+    //Brain.Screen.print(Flywheel.voltage());
+    /*Flywheel.setVelocity(rotateSpeed/6, rpm);
+    Flywheel.spin(forward);
+    Brain.Screen.clearLine();
+    Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
+    vex::task::sleep(10);
+    //i++;
+  }
+  return(1);
+}
+
 float convertYToX(float yvalue){
   int xvalue = ((log((600/yvalue) - 1))/-0.006)+480;
   if (yvalue ==0){
@@ -221,35 +249,36 @@ int Startup(){
 
 void OnRoller(){
   vex::task runPId(Startup);
-  Intake.spinFor(forward, 220, degrees);
-  motorRotate(300, 300);
+  //Intake.spinFor(forward, 220, degrees);
+  motorRotate(100, 100);
+  motorRotate(-50, 50);
   wait(3, seconds);
+  
   enableFlyPID = true;
-  volts = 9.5;
+  rotateSpeed = 2650;
   enableLogistic = false;
-  vex::task runPID(FlyWheelPID);
-  inertialRotate(340);  
-  wait(1, sec);
+  vex::task runPID(FlyWheelPIDRPM);
+    
+  wait(7, sec);
   shoot();
-  wait(2, seconds);
-  shoot();
-  wait(2, seconds);
+  rotateSpeed = 2650;
+  wait(3.5, seconds);
   shoot();
 }
 
 void OffRoller(){
   vex::task runPId(Startup);
-  Intake.spinFor(forward, 220, degrees);
-  motorRotate(600, 600);
+  //Intake.spinFor(forward, 220, degrees);
+  motorRotate(150, 150);
+  motorRotate(-75, 75);
   wait(3, seconds);
+  
   enableFlyPID = true;
-  volts = 8.5;
+  volts = 9.5;
   enableLogistic = false;
   vex::task runPID(FlyWheelPID);
-  inertialRotate(25);  
-  wait(1, sec);
-  shoot();
-  wait(2, seconds);
+  
+  wait(7, sec);
   shoot();
   wait(2, seconds);
   shoot();
@@ -341,11 +370,11 @@ void usercontrol(void) {
     Brain.Screen.clearLine();
     if (Controller1.Axis4.value() != 0) {
       leftVal += Controller1.Axis4.value()/2;
-      rightVal += Controller1.Axis4.value()/2;
+      rightVal -= Controller1.Axis4.value()/2;
     }
     if (Controller1.Axis3.value() != 0) {
       leftVal += Controller1.Axis3.value();
-      rightVal -= Controller1.Axis3.value();
+      rightVal += Controller1.Axis3.value();
     }
     leftDrive.spin(fwd, leftVal, pct);
     rightDrive.spin(fwd, rightVal, pct);
