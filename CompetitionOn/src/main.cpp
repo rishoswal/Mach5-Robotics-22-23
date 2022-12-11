@@ -40,7 +40,7 @@ double kD = 0.003;
 int flySpeed;
 
 int counter = 0;
-int rotateSpeed = 2300;
+int rotateSpeed = 2000;
 int error;
 int prevError;
 int derivative;
@@ -285,11 +285,33 @@ int Startup(){
   return 1;
 }
 
+void TurnRoller(){
+  right1.spin(forward);
+  right2.spin(forward);
+  right3.spin(forward);
+  left1.spin(forward);
+  left2.spin(forward);
+  left3.spin(forward);
+  Intake.spinFor(reverse, 500, degrees);
+  right1.stop();
+  right2.stop();
+  right3.stop();
+  left1.stop();
+  left2.stop();
+  left3.stop();
+}
+
 void OnRoller(){
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
-  motorRotate(100, 100);
-  motorRotate(-50, 50);
+  cosdrive(2, 50);
+  TurnRoller();
+    
+  motorRotate(-160, -160);
+  motorRotate(0, -350);
+  motorRotate(-100, -100);
+  turn(159);
+
   wait(3, seconds);
   
   enableFlyPID = true;
@@ -297,10 +319,10 @@ void OnRoller(){
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
     
-  wait(7, sec);
+  wait(2, sec);
   shoot();
-  rotateSpeed = 2650;
-  wait(3.5, seconds);
+  //rotateSpeed = 2650;
+  wait(2.5, seconds);
   shoot();
 }
 

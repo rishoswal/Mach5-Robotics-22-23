@@ -117,8 +117,12 @@ Discarded input sections
                 0x00000000       0x3c build/src/main.o
  .ARM.exidx.text._ZN3vex5brain3lcd5printIfEEvT_
                 0x00000000        0x8 build/src/main.o
+ .text._Z10TurnRollerv
+                0x00000000      0x108 build/src/main.o
+ .ARM.exidx.text._Z10TurnRollerv
+                0x00000000        0x8 build/src/main.o
  .text._Z8OnRollerv
-                0x00000000      0x110 build/src/main.o
+                0x00000000      0x150 build/src/main.o
  .ARM.exidx.text._Z8OnRollerv
                 0x00000000        0x8 build/src/main.o
  .text._Z9OffRollerv
