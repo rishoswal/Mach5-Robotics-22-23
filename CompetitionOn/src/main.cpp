@@ -89,6 +89,44 @@ void motorRotate(double degreeLeft, double degreeRight) {
   left2.rotateFor(degreeLeft, degrees);
   // wait(0.5, sec);
 }
+
+timer drivetimer;
+void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
+// better explanation and visualization here: https://www.desmos.com/calculator/begor0sggm
+	double velocity;
+  double seconds=fabs((3.5*inches)/speed); //calculates the time the robot will take to complete a cycle based on the wheel
+  //circumference, gear ratio, target distance, and motor speed.
+  drivetimer.reset();
+  while(drivetimer.time(sec)<seconds){
+    velocity=(1-cos((6.283*drivetimer.time(sec))/seconds))*speed/2 * (fabs(inches)/inches); //uses equation for the cosine wave to calculate velocity.
+    leftDrive.spin(forward,velocity,percent);
+		rightDrive.spin(forward,velocity,percent);
+	}                                                                                                                                                              
+	leftDrive.stop();
+	rightDrive.stop();
+}
+
+int endAngle=0; //driving forward will drift the back encoder unintentionally,
+//so we save the value of where we turned last and use it when turning again to ignore drift.
+void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
+  //Inertial.setRotation(endAngle, degrees);
+  float error = angle-(Inertial.rotation(degrees)*1.0143);
+  while(fabs(error)>2||fabs(Inertial.gyroRate(zaxis, rpm))>1){ //exits loop if error <2 and rotational speed <1
+    error = angle-(Inertial.rotation(degrees)*1.0143);//calculates error value
+    if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
+      leftDrive.spin(forward,36*(fabs(error)/error),percent);
+      rightDrive.spin(reverse,36*(fabs(error)/error),percent);
+    }else{
+      leftDrive.spin(forward,error*0.73,percent);
+      rightDrive.spin(reverse,error*0.73,percent);
+    }
+  }
+  leftDrive.stop();
+  rightDrive.stop();
+  Brain.Screen.printAt(1,20,"%f",Inertial.heading());
+  //endAngle=Inertial.heading();
+}
+
 void inertialRotate(int heading){
   int newTurn = heading;
   if ((Inertial.heading(degrees) < newTurn &&
@@ -295,7 +333,8 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  OnRoller();
+  //OnRoller();
+  cosdrive(24, 50);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
