@@ -181,7 +181,7 @@ void pre_auton(void) {
   // Example: clearing encoders, setting servo positions, ...
 }
 
-int FlyWheelPID() {
+/*int FlyWheelPID() {
   int i = 0;
   while (enableFlyPID) {
     diff = 0;
@@ -199,15 +199,15 @@ int FlyWheelPID() {
     
     //Brain.Screen.clearLine();
     //Brain.Screen.print(Flywheel.voltage());
-    /*Flywheel.setVelocity(rotateSpeed/6, rpm);
-    Flywheel.spin(forward);
-    Brain.Screen.clearLine();
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
+    //Flywheel.setVelocity(rotateSpeed/6, rpm);
+    //Flywheel.spin(forward);
+    //Brain.Screen.clearLine();
+    //Brain.Screen.print(Flywheel.velocity(rpm)*6);
     vex::task::sleep(10);
     //i++;
   }
   return(1);
-}
+}*/
 
 int FlyWheelPIDRPM() {
   int i = 0;
@@ -286,7 +286,7 @@ int Startup(){
     Brain.Screen.print(Flywheel.velocity(rpm)*6);
   }
   //Flywheel.spin(forward, 7, volt);
-  //enableFlyPID = true;
+  enableFlyPID = true;
   return 1;
 }
 
@@ -297,7 +297,7 @@ void TurnRoller(){
   left1.spin(forward);
   left2.spin(forward);
   left3.spin(forward);
-  Intake.spinFor(reverse, 200, degrees);
+  Intake.spinFor(reverse, 280, degrees);
   right1.stop();
   right2.stop();
   right3.stop();
@@ -331,6 +331,7 @@ void OnRoller(){
   wait(2.5, seconds);
   shoot();
   rotateSpeed = 2000;
+  finalSpeed = 1800;
 }
 
 void OffRoller(){
@@ -347,7 +348,7 @@ void OffRoller(){
   //volts = 9.5;
   rotateSpeed = 2600;
   enableLogistic = false;
-  vex::task runPID(FlyWheelPID);
+  vex::task runPID(FlyWheelPIDRPM);
   
   wait(2, sec);
   shoot();
@@ -359,6 +360,8 @@ void OffRoller(){
   cosdrive(35, 80);
   leftDrive.rotateFor(270, degrees);
   TurnRoller();
+  rotateSpeed = 2000;
+  finalSpeed = 1800;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -372,11 +375,12 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  if(autonswitch.value(percent)<50){
+  OnRoller();
+  /*if(autonswitch.value(percent)<50){
     OffRoller();
   }else{
     OnRoller();
-  }
+  }*/
   //cosdrive(24, 50);
   // ..........................................................................
   // Insert autonomous user code here.
@@ -403,10 +407,10 @@ void usercontrol(void) {
       // if the axis 3 and axis 1's value is 0 the right and left wheel motors
       // should stop
 
-    /*if (counter == 0){
+    if (counter == 0){
       vex::task runPID(Startup);
       counter ++;
-    }*/
+    }
     //while(true){
     if(Controller1.ButtonR1.pressing()&&volts<11){
       volts+=0.5;
@@ -445,7 +449,7 @@ void usercontrol(void) {
     //Flywheel.spin(forward, volts, volt);
     //vex::task FlyWheelPID();
 
-    vex::task runPID(FlyWheelPID); 
+    vex::task runPID(FlyWheelPIDRPM); 
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
       // when the axis 3 value is greater than zero the motor moves forward
