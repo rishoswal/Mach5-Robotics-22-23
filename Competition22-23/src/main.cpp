@@ -12,16 +12,18 @@
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
 // Flywheel             motor         9               
-// left1              motor         19              
-// left2              motor         20              
-// left3              motor         18              
-// right1              motor         16              
-// right2              motor         17              
-// right3              motor         12              
+// left1                motor         19              
+// left2                motor         20              
+// left3                motor         18              
+// right1               motor         16              
+// right2               motor         17              
+// right3               motor         12              
 // DigitalOutH          digital_out   H               
 // DigitalOutG          digital_out   G               
 // Intake               motor         14              
-// Inertial             inertial      1               
+// Inertial             inertial      3               
+// expander             triport       8               
+// autonswitch          potV2         H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -40,7 +42,8 @@ double kD = 0.003;
 int flySpeed;
 
 int counter = 0;
-int rotateSpeed = 2300;
+int finalSpeed = 1800;
+int rotateSpeed = 2000;
 int error;
 int prevError;
 int derivative;
@@ -89,6 +92,44 @@ void motorRotate(double degreeLeft, double degreeRight) {
   left2.rotateFor(degreeLeft, degrees);
   // wait(0.5, sec);
 }
+
+timer drivetimer;
+void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
+// better explanation and visualization here: https://www.desmos.com/calculator/begor0sggm
+	double velocity;
+  double seconds=fabs((3.5*inches)/speed); //calculates the time the robot will take to complete a cycle based on the wheel
+  //circumference, gear ratio, target distance, and motor speed.
+  drivetimer.reset();
+  while(drivetimer.time(sec)<seconds){
+    velocity=(1-cos((6.283*drivetimer.time(sec))/seconds))*speed/2 * (fabs(inches)/inches); //uses equation for the cosine wave to calculate velocity.
+    leftDrive.spin(forward,velocity,percent);
+		rightDrive.spin(forward,velocity,percent);
+	}                                                                                                                                                              
+	leftDrive.stop();
+	rightDrive.stop();
+}
+
+int endAngle=0; //driving forward will drift the back encoder unintentionally,
+//so we save the value of where we turned last and use it when turning again to ignore drift.
+void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
+  //Inertial.setRotation(endAngle, degrees);
+  float error = angle-(Inertial.rotation(degrees)*1.0143);
+  while(fabs(error)>2||fabs(Inertial.gyroRate(zaxis, rpm))>1){ //exits loop if error <2 and rotational speed <1
+    error = angle-(Inertial.rotation(degrees)*1.0143);//calculates error value
+    if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
+      leftDrive.spin(forward,36*(fabs(error)/error),percent);
+      rightDrive.spin(reverse,36*(fabs(error)/error),percent);
+    }else{
+      leftDrive.spin(forward,error*0.73,percent);
+      rightDrive.spin(reverse,error*0.73,percent);
+    }
+  }
+  leftDrive.stop();
+  rightDrive.stop();
+  Brain.Screen.printAt(1,20,"%f",Inertial.heading());
+  //endAngle=Inertial.heading();
+}
+
 void inertialRotate(int heading){
   int newTurn = heading;
   if ((Inertial.heading(degrees) < newTurn &&
@@ -174,6 +215,8 @@ int FlyWheelPIDRPM() {
     diff = 0;
     error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
     derivative = error - prevError;
+    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    Brain.Screen.clearLine();
     diff = (error * kP) + (derivative * kD);
     prevError = error;
     currSpeed = Flywheel.velocity(rpm) - diff;
@@ -232,26 +275,49 @@ int Startup(){
 //wait(5, sec);
   float counter = 0;
   Brain.Screen.print(counter);
-  while (Flywheel.velocity(rpm)*6 < 1780 && enableLogistic == true) {
+  while (Flywheel.velocity(rpm)*6 < finalSpeed && enableLogistic == true) {
     //int flyrotation = Rotation.velocity(rpm);
-    Flywheel.setVelocity(((1900/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
+    Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
     Flywheel.spin(forward);
     //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
-    counter += 65;
+    counter += 85;
     wait(0.7, sec);
     Brain.Screen.clearLine();
     Brain.Screen.print(Flywheel.velocity(rpm)*6);
   }
-  Flywheel.spin(forward, 7, volt);
-  enableFlyPID = true;
+  //Flywheel.spin(forward, 7, volt);
+  //enableFlyPID = true;
   return 1;
 }
 
+void TurnRoller(){
+  right1.spin(forward);
+  right2.spin(forward);
+  right3.spin(forward);
+  left1.spin(forward);
+  left2.spin(forward);
+  left3.spin(forward);
+  Intake.spinFor(reverse, 200, degrees);
+  right1.stop();
+  right2.stop();
+  right3.stop();
+  left1.stop();
+  left2.stop();
+  left3.stop();
+}
+
 void OnRoller(){
+  finalSpeed = 2300;
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
-  motorRotate(100, 100);
-  motorRotate(-50, 50);
+  //cosdrive(2, 50);
+  TurnRoller();
+    
+  motorRotate(-160, -160);
+  rightDrive.rotateFor(-350, degrees);
+  motorRotate(-100, -100);
+  turn(158);
+
   wait(3, seconds);
   
   enableFlyPID = true;
@@ -259,29 +325,40 @@ void OnRoller(){
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
     
-  wait(7, sec);
+  wait(2, sec);
   shoot();
-  rotateSpeed = 2650;
-  wait(3.5, seconds);
+  //rotateSpeed = 2650;
+  wait(2.5, seconds);
   shoot();
+  rotateSpeed = 2000;
 }
 
 void OffRoller(){
+  finalSpeed = 2300;
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
-  motorRotate(150, 150);
-  motorRotate(-75, 75);
-  wait(3, seconds);
+  cosdrive(27, 50);
+  turn(15);
+
+  //motorRotate(-75, 75);
+  wait(2, seconds);
   
   enableFlyPID = true;
-  volts = 9.5;
+  //volts = 9.5;
+  rotateSpeed = 2600;
   enableLogistic = false;
   vex::task runPID(FlyWheelPID);
   
-  wait(7, sec);
+  wait(2, sec);
   shoot();
-  wait(2, seconds);
+  wait(2.5, seconds);
   shoot();
+
+  rightDrive.rotateFor(-40, degrees);
+  turn(145);
+  cosdrive(35, 80);
+  leftDrive.rotateFor(270, degrees);
+  TurnRoller();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -295,7 +372,12 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  OnRoller();
+  if(autonswitch.value(percent)<50){
+    OffRoller();
+  }else{
+    OnRoller();
+  }
+  //cosdrive(24, 50);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -321,10 +403,10 @@ void usercontrol(void) {
       // if the axis 3 and axis 1's value is 0 the right and left wheel motors
       // should stop
 
-    if (counter == 0){
+    /*if (counter == 0){
       vex::task runPID(Startup);
       counter ++;
-    }
+    }*/
     //while(true){
     if(Controller1.ButtonR1.pressing()&&volts<11){
       volts+=0.5;
@@ -404,10 +486,10 @@ void usercontrol(void) {
     Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
     Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
     Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
-    Brain.Screen.printAt(15, 85, "   AngularV: %f", Flywheel.velocity(dps)*0.3142);
-    Brain.Screen.printAt(15, 100, " Efficiency; %f", Flywheel.efficiency());
-    Brain.Screen.printAt(15, 115, "  Heat Loss: %f", heat);
-    Brain.Screen.printAt(15, 130, " Resistance: %f", Flywheel.voltage()/Flywheel.current());
+    Brain.Screen.printAt(15, 85, "        RPM: %f", Flywheel.velocity(rpm)*6);
+    Brain.Screen.printAt(15, 100, "Efficiency; %f", Flywheel.efficiency());
+    Brain.Screen.printAt(15, 115, " Heat Loss: %f", heat);
+    Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
     Controller1.Screen.setCursor(1,1);
     Controller1.Screen.print("%.2f",volts);
     // This is the main execution loop for the user control program.
