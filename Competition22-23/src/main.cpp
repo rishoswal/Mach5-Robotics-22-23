@@ -297,7 +297,7 @@ void TurnRoller(){
   left1.spin(forward);
   left2.spin(forward);
   left3.spin(forward);
-  Intake.spinFor(reverse, 280, degrees);
+  Intake.spinFor(reverse, 0.8, seconds);
   right1.stop();
   right2.stop();
   right3.stop();
@@ -325,13 +325,15 @@ void OnRoller(){
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
     
-  wait(2, sec);
+  wait(2.5, sec);
   shoot();
   //rotateSpeed = 2650;
   wait(2.5, seconds);
   shoot();
   rotateSpeed = 2000;
   finalSpeed = 1800;
+  enableFlyPID = false;
+  Flywheel.stop(coast);
 }
 
 void OffRoller(){
@@ -362,6 +364,8 @@ void OffRoller(){
   TurnRoller();
   rotateSpeed = 2000;
   finalSpeed = 1800;
+  enableFlyPID = false;
+  Flywheel.stop(coast);
 }
 
 /*---------------------------------------------------------------------------*/
