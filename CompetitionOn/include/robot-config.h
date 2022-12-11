@@ -15,6 +15,8 @@ extern digital_out DigitalOutH;
 extern digital_out DigitalOutG;
 extern motor Intake;
 extern inertial Inertial;
+extern triport expander;
+extern potV2 autonswitch;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

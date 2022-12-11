@@ -8,6 +8,7 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
+triport expander = triport(PORT8);
 controller Controller1 = controller(primary);
 motor Flywheel = motor(PORT9, ratio6_1, false);
 motor left1 = motor(PORT19, ratio18_1, false);
@@ -19,7 +20,8 @@ motor right3 = motor(PORT12, ratio18_1, true);
 digital_out DigitalOutH = digital_out(Brain.ThreeWirePort.H);
 digital_out DigitalOutG = digital_out(Brain.ThreeWirePort.G);
 motor Intake = motor(PORT14, ratio18_1, false);
-inertial Inertial = inertial(PORT1);
+inertial Inertial = inertial(PORT3);
+potV2 autonswitch = potV2(expander.H);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

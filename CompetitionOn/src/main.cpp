@@ -21,7 +21,9 @@
 // DigitalOutH          digital_out   H               
 // DigitalOutG          digital_out   G               
 // Intake               motor         14              
-// Inertial             inertial      1               
+// Inertial             inertial      3               
+// expander             triport       8               
+// autonswitch          potV2         H               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -40,6 +42,7 @@ double kD = 0.003;
 int flySpeed;
 
 int counter = 0;
+int finalSpeed = 1800;
 int rotateSpeed = 2000;
 int error;
 int prevError;
@@ -212,6 +215,8 @@ int FlyWheelPIDRPM() {
     diff = 0;
     error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
     derivative = error - prevError;
+    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    Brain.Screen.clearLine();
     diff = (error * kP) + (derivative * kD);
     prevError = error;
     currSpeed = Flywheel.velocity(rpm) - diff;
@@ -270,18 +275,18 @@ int Startup(){
 //wait(5, sec);
   float counter = 0;
   Brain.Screen.print(counter);
-  while (Flywheel.velocity(rpm)*6 < 1780 && enableLogistic == true) {
+  while (Flywheel.velocity(rpm)*6 < finalSpeed && enableLogistic == true) {
     //int flyrotation = Rotation.velocity(rpm);
-    Flywheel.setVelocity(((1900/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
+    Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
     Flywheel.spin(forward);
     //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
-    counter += 65;
+    counter += 85;
     wait(0.7, sec);
     Brain.Screen.clearLine();
     Brain.Screen.print(Flywheel.velocity(rpm)*6);
   }
-  Flywheel.spin(forward, 7, volt);
-  enableFlyPID = true;
+  //Flywheel.spin(forward, 7, volt);
+  //enableFlyPID = true;
   return 1;
 }
 
@@ -292,7 +297,7 @@ void TurnRoller(){
   left1.spin(forward);
   left2.spin(forward);
   left3.spin(forward);
-  Intake.spinFor(reverse, 500, degrees);
+  Intake.spinFor(reverse, 200, degrees);
   right1.stop();
   right2.stop();
   right3.stop();
@@ -302,15 +307,16 @@ void TurnRoller(){
 }
 
 void OnRoller(){
+  finalSpeed = 2300;
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
-  cosdrive(2, 50);
+  //cosdrive(2, 50);
   TurnRoller();
     
   motorRotate(-160, -160);
-  motorRotate(0, -350);
+  rightDrive.rotateFor(-350, degrees);
   motorRotate(-100, -100);
-  turn(159);
+  turn(158);
 
   wait(3, seconds);
   
@@ -324,24 +330,35 @@ void OnRoller(){
   //rotateSpeed = 2650;
   wait(2.5, seconds);
   shoot();
+  rotateSpeed = 2000;
 }
 
 void OffRoller(){
+  finalSpeed = 2300;
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
-  motorRotate(150, 150);
-  motorRotate(-75, 75);
-  wait(3, seconds);
+  cosdrive(27, 50);
+  turn(15);
+
+  //motorRotate(-75, 75);
+  wait(2, seconds);
   
   enableFlyPID = true;
-  volts = 9.5;
+  //volts = 9.5;
+  rotateSpeed = 2600;
   enableLogistic = false;
   vex::task runPID(FlyWheelPID);
   
-  wait(7, sec);
+  wait(2, sec);
   shoot();
-  wait(2, seconds);
+  wait(2.5, seconds);
   shoot();
+
+  rightDrive.rotateFor(-40, degrees);
+  turn(145);
+  cosdrive(35, 80);
+  leftDrive.rotateFor(270, degrees);
+  TurnRoller();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -355,8 +372,12 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  //OnRoller();
-  cosdrive(24, 50);
+  if(autonswitch.value(percent)<50){
+    OffRoller();
+  }else{
+    OnRoller();
+  }
+  //cosdrive(24, 50);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -382,10 +403,10 @@ void usercontrol(void) {
       // if the axis 3 and axis 1's value is 0 the right and left wheel motors
       // should stop
 
-    if (counter == 0){
+    /*if (counter == 0){
       vex::task runPID(Startup);
       counter ++;
-    }
+    }*/
     //while(true){
     if(Controller1.ButtonR1.pressing()&&volts<11){
       volts+=0.5;
@@ -465,10 +486,10 @@ void usercontrol(void) {
     Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
     Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
     Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
-    Brain.Screen.printAt(15, 85, "   AngularV: %f", Flywheel.velocity(dps)*0.3142);
-    Brain.Screen.printAt(15, 100, " Efficiency; %f", Flywheel.efficiency());
-    Brain.Screen.printAt(15, 115, "  Heat Loss: %f", heat);
-    Brain.Screen.printAt(15, 130, " Resistance: %f", Flywheel.voltage()/Flywheel.current());
+    Brain.Screen.printAt(15, 85, "        RPM: %f", Flywheel.velocity(rpm)*6);
+    Brain.Screen.printAt(15, 100, "Efficiency; %f", Flywheel.efficiency());
+    Brain.Screen.printAt(15, 115, " Heat Loss: %f", heat);
+    Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
     Controller1.Screen.setCursor(1,1);
     Controller1.Screen.print("%.2f",volts);
     // This is the main execution loop for the user control program.
