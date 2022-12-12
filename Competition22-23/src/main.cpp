@@ -18,8 +18,8 @@
 // right1               motor         16              
 // right2               motor         17              
 // right3               motor         12              
-// DigitalOutH          digital_out   H               
-// DigitalOutG          digital_out   G               
+// Blocker              digital_out   H               
+// Shooter              digital_out   G               
 // Intake               motor         14              
 // Inertial             inertial      3               
 // expander             triport       8               
@@ -151,26 +151,20 @@ void inertialRotate(int heading){
 motorStopAll(hold);
 }
 
-void openP(){
-  while(Controller1.ButtonA.pressing()){
-    DigitalOutH.set(true);
-  }
-}
-void closeP(){
-  DigitalOutH.set(false);
-}
-
 void shoot(){
-  DigitalOutG.set(true);
-  wait(0.25, sec);
-  DigitalOutG.set(false);
+  Blocker.set(false);
+  wait(0.3, sec);
+  Shooter.set(true);
+  wait(0.3, sec);
+  Shooter.set(false);
+  Blocker.set(true);
   //return(1);
 }
 
 void expansion(){
-  DigitalOutH.set(true);
+  /*Blocker.set(true);
   wait(0.3, sec);
-  DigitalOutH.set(false);
+  Blocker.set(false);*/
 }
 
 void pre_auton(void) {
@@ -327,7 +321,7 @@ void OnRoller(){
     
   wait(2.5, sec);
   shoot();
-  //rotateSpeed = 2650;
+  rotateSpeed = rotateSpeed -= 80;
   wait(2.5, seconds);
   shoot();
   rotateSpeed = 2000;
@@ -383,7 +377,7 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  OffRoller();
+  OnRoller();
   /*if(autonswitch.value(percent)<50){
     OffRoller();
   }else{
@@ -407,6 +401,7 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
+  Blocker.set(true);
   while (1) {
       int leftVal = 0;
       int rightVal = 0;
@@ -421,36 +416,41 @@ void usercontrol(void) {
     }
     //while(true){
     if(Controller1.ButtonR1.pressing()&&volts<11){
-      volts+=0.5;
+      rotateSpeed += 75;
+      volts += 0.5;
       wait(0.2, sec);
     }
 
     if(Controller1.ButtonUp.pressing()){
       volts = 9.5;
+      rotateSpeed = 2650;
       wait(0.2, sec);
     }
   
     if(Controller1.ButtonDown.pressing()){
       volts=7.5;
-      enableFlyPID=false;
-      Flywheel.spin(forward, volts, volt);
-      wait(0.2, sec);
-      enableFlyPID = true;
+      rotateSpeed = 2000;
+      //enableFlyPID=false;
+      //Flywheel.spin(forward, 2000/6, rpm);
+      //wait(0.2, sec);
+      //enableFlyPID = true;
       //wait(0.2, sec);
 
     }
 
     if(Controller1.ButtonL1.pressing()&&volts>0){
       volts-=0.5;
-      enableFlyPID=false;
-      Flywheel.spin(forward, volts, volt);
-      wait(0.2, sec);
-      enableFlyPID = true;
+      rotateSpeed -= 75;
+      //enableFlyPID=false;
+      //Flywheel.spin(forward, rotateSpeed/6, volt);
+      //wait(0.2, sec);
+      //enableFlyPID = true;
       //wait(0.2, sec);
 
     }
     if(Controller1.ButtonDown.pressing()){
       volts=0;
+      rotateSpeed = 0;
     }
 
     // Generally, 7 to 10 volts is a good range for all distances on th field
