@@ -162,7 +162,7 @@ void closeP(){
 
 void shoot(){
   DigitalOutG.set(true);
-  wait(0.2, sec);
+  wait(0.25, sec);
   DigitalOutG.set(false);
   //return(1);
 }
@@ -280,7 +280,7 @@ int Startup(){
     Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
     Flywheel.spin(forward);
     //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
-    counter += 85;
+    counter += 95;
     wait(0.7, sec);
     Brain.Screen.clearLine();
     Brain.Screen.print(Flywheel.velocity(rpm)*6);
@@ -337,29 +337,33 @@ void OnRoller(){
 }
 
 void OffRoller(){
-  finalSpeed = 2300;
+  finalSpeed = 2090;
   vex::task runPId(Startup);
   //Intake.spinFor(forward, 220, degrees);
   cosdrive(27, 50);
-  turn(15);
+  turn(16.5);
 
   //motorRotate(-75, 75);
-  wait(2, seconds);
+  wait(2.5, seconds);
   
   enableFlyPID = true;
   //volts = 9.5;
-  rotateSpeed = 2600;
+  rotateSpeed = 2530;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
   
-  wait(2, sec);
+  wait(2.5, sec);
   shoot();
+  //rotateSpeed = rotateSpeed += 80;
+  turn(16.5);
   wait(2.5, seconds);
   shoot();
 
+  rightDrive.setVelocity(100, percent);
   rightDrive.rotateFor(-40, degrees);
-  turn(145);
-  cosdrive(35, 80);
+  turn(143);
+  cosdrive(40, 100);
+  leftDrive.setVelocity(100, percent);
   leftDrive.rotateFor(270, degrees);
   TurnRoller();
   rotateSpeed = 2000;
@@ -379,7 +383,7 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  OnRoller();
+  OffRoller();
   /*if(autonswitch.value(percent)<50){
     OffRoller();
   }else{
