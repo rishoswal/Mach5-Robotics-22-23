@@ -29,27 +29,24 @@
 
 using namespace vex;
 
-float xPos;
-float yPos;
-float heading;
-
-float previousFB;
-float currentFB;
-float changeFB;
-
-float previousLR;
-float currentLR;
-float changeLR;
-
 const float degreesToRadians = 2 * 3.141593 / 360.0;
 const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
 
-int main() {
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
+void odometryInertial(){
+  float xPos = 0;
+  float yPos = 0;
+  float heading;
+
+  float previousFB;
+  float currentFB = 0;
+  float changeFB;
+
+  float previousLR;
+  float currentLR = 0;
+  float changeLR;
+
   Inertial.calibrate();
   wait(3,sec);
-  //heading = Inertial.heading();
 
   while(true){
     previousFB = currentFB;
@@ -63,16 +60,74 @@ int main() {
     xPos += ((changeFB * sin(heading)) + (changeLR * cos(heading))) * degreesToInches;
     yPos += ((changeFB * cos(heading)) + (changeLR * sin(heading))) * degreesToInches;
 
-
     Brain.Screen.printAt(15, 25, "    x position: %f", xPos);
     Brain.Screen.printAt(15, 40, "    y position: %f", yPos);
     Brain.Screen.printAt(15, 55, "       heading: %f", heading);
     Brain.Screen.printAt(15, 70, "  Left Encoder: %f", lEncoder.position(degrees));
     Brain.Screen.printAt(15, 85, " Right Encoder: %f", rEncoder.position(degrees));
     Brain.Screen.printAt(15, 100, "Middle Encoder: %f", mEncoder.position(degrees));
-    Brain.Screen.printAt(15, 115, "cock: %f", sin(3.1415/2));
-
 
     wait(20, msec);
   }
+}
+
+void odometry(){
+  float xPos = 0;
+  float yPos = 0;
+  float heading = 0;
+
+  float previousL;
+  float currentL = 0;
+  float changeL;
+
+  float previousR;
+  float currentR = 0;
+  float changeR;
+
+  float previousM;
+  float currentM = 0;
+  float changeM;
+
+  float changeFB;
+
+  const float robotDiameter = 6.875;
+
+  wait(1, sec);
+
+  while(true){
+    previousL = currentL;
+    currentL = lEncoder.position(degrees);
+    changeL = currentL - previousL;
+    
+    previousR = currentR;
+    currentR = rEncoder.position(degrees);
+    changeR = currentR - previousR;
+
+    previousM = currentM;
+    currentM = mEncoder.position(degrees);
+    changeM = (currentM - previousM) * degreesToInches;
+
+    heading = (currentL - currentR) * degreesToInches / robotDiameter;
+    changeFB = (changeL + changeR) * degreesToInches / 2;
+
+    xPos += ((changeFB * sin(heading)) + (changeM * cos(heading)));
+    yPos += ((changeFB * cos(heading)) - (changeM * sin(heading)));
+
+    Brain.Screen.printAt(15, 25, "      x position: %f", xPos);
+    Brain.Screen.printAt(15, 40, "      y position: %f", yPos);
+    Brain.Screen.printAt(15, 55, "         heading: %f", heading);
+    Brain.Screen.printAt(15, 70, "    Left Encoder: %f", lEncoder.position(degrees));
+    Brain.Screen.printAt(15, 85, "   Right Encoder: %f", rEncoder.position(degrees));
+    Brain.Screen.printAt(15, 100, "  Middle Encoder: %f", mEncoder.position(degrees));
+    Brain.Screen.printAt(15, 115, "Forward/backward: %f", changeFB);
+
+    wait(20, msec);
+  }
+}
+
+int main() {
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
+
+  odometry();  
 }
