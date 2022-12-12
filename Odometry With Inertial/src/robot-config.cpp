@@ -8,6 +8,7 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
+triport Expander8 = triport(PORT8);
 motor l1 = motor(PORT18, ratio18_1, false);
 motor l2 = motor(PORT19, ratio18_1, false);
 motor l3 = motor(PORT20, ratio18_1, false);
@@ -17,6 +18,9 @@ motor r3 = motor(PORT17, ratio18_1, true);
 inertial Inertial = inertial(PORT3);
 digital_out DigitalOutG = digital_out(Brain.ThreeWirePort.G);
 digital_out DigitalOutH = digital_out(Brain.ThreeWirePort.H);
+encoder lEncoder = encoder(Expander8.A);
+encoder rEncoder = encoder(Brain.ThreeWirePort.A);
+encoder mEncoder = encoder(Expander8.C);
 
 // VEXcode generated functions
 

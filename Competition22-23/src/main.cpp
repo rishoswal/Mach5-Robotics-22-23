@@ -140,8 +140,8 @@ void inertialRotate(int heading){
     } else {
       turnRight = -1;
     }
-  while (abs(Inertial.heading(degrees) - newTurn) > 2) {
-    int spinFactor = abs(Inertial.heading(degrees) - newTurn);
+  while (fabs(Inertial.heading(degrees) - newTurn) > 2) {
+    int spinFactor = fabs(Inertial.heading(degrees) - newTurn);
     if (turnRight == -1) {
       motorSpin(fwd, -1 * spinFactor - 20, spinFactor + 20);
     } else {
