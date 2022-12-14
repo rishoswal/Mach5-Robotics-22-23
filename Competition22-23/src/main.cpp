@@ -93,6 +93,15 @@ void motorRotate(double degreeLeft, double degreeRight) {
   // wait(0.5, sec);
 }
 
+void motorVelocity(int newVelocity){
+  right1.setVelocity(newVelocity, percent);
+  right2.setVelocity(newVelocity, percent);
+  right3.setVelocity(newVelocity, percent);
+  left1.setVelocity(newVelocity, percent);
+  left2.setVelocity(newVelocity, percent);
+  left3.setVelocity(newVelocity, percent);
+}
+
 timer drivetimer;
 void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
 // better explanation and visualization here: https://www.desmos.com/calculator/begor0sggm
@@ -366,6 +375,36 @@ void OffRoller(){
   Flywheel.stop(coast);
 }
 
+void FullWin(){
+  finalSpeed = 2300;
+  vex::task runPId(Startup);
+  //Intake.spinFor(forward, 220, degrees);
+  //cosdrive(2, 50);
+  TurnRoller();
+    
+  motorRotate(-160, -160);
+  rightDrive.rotateFor(-300, degrees);
+  motorVelocity(100);
+  cosdrive(-110, 100);
+  enableFlyPID = true;
+  rotateSpeed = 2650;
+  enableLogistic = false;
+  vex::task runPID(FlyWheelPIDRPM);
+  turn(97);
+  shoot();
+  wait(1.5, seconds);
+  shoot();
+  turn(225);
+  cosdrive(20, 100);
+  leftDrive.setVelocity(100, percent);
+  leftDrive.rotateFor(270, degrees);
+  TurnRoller();
+
+  rotateSpeed = 2000;
+  finalSpeed = 1800;
+  enableFlyPID = false;
+  Flywheel.stop(coast);
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -377,7 +416,8 @@ void OffRoller(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  OnRoller();
+  FullWin();
+ // OnRoller();
   /*if(autonswitch.value(percent)<50){
     OffRoller();
   }else{
