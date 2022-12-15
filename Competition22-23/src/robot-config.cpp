@@ -22,6 +22,8 @@ digital_out Shooter = digital_out(Brain.ThreeWirePort.G);
 motor Intake = motor(PORT14, ratio18_1, false);
 inertial Inertial = inertial(PORT3);
 potV2 autonswitch = potV2(expander.H);
+digital_out LeftExpansion = digital_out(expander.E);
+digital_out RightMidExpansion = digital_out(expander.G);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

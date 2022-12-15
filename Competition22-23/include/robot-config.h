@@ -17,6 +17,8 @@ extern motor Intake;
 extern inertial Inertial;
 extern triport expander;
 extern potV2 autonswitch;
+extern digital_out LeftExpansion;
+extern digital_out RightMidExpansion;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

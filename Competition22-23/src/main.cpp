@@ -24,6 +24,8 @@
 // Inertial             inertial      3               
 // expander             triport       8               
 // autonswitch          potV2         H               
+// LeftExpansion        digital_out   E               
+// RightMidExpansion    digital_out   G               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -330,8 +332,8 @@ void OnRoller(){
     
   wait(2.5, sec);
   shoot();
-  rotateSpeed = rotateSpeed -= 80;
-  wait(2.5, seconds);
+  //rotateSpeed = rotateSpeed -= 80;
+  wait(1.5, seconds);
   shoot();
   rotateSpeed = 2000;
   finalSpeed = 1800;
@@ -417,7 +419,7 @@ void FullWin(){
 
 void autonomous(void) {
   FullWin();
- // OnRoller();
+  // OnRoller();
   /*if(autonswitch.value(percent)<50){
     OffRoller();
   }else{
@@ -532,7 +534,11 @@ void usercontrol(void) {
     //Controller1.ButtonB.pressed(closeP);
     Controller1.ButtonR2.pressed(shoot);
     Controller1.ButtonB.pressed(expansion);
-
+    if(Controller1.ButtonY.pressing()){
+      RightMidExpansion.set(true);
+      wait(5, sec);
+      LeftExpansion.set(true);
+    }
     //Brain.Screen.clearScreen();
     Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
     Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
