@@ -16,15 +16,17 @@ motor r1 = motor(PORT11, ratio18_1, true);
 motor r2 = motor(PORT16, ratio18_1, true);
 motor r3 = motor(PORT17, ratio18_1, true);
 inertial Inertial = inertial(PORT3);
-digital_out DigitalOutG = digital_out(Brain.ThreeWirePort.G);
+digital_out shoota = digital_out(Brain.ThreeWirePort.G);
 digital_out DigitalOutH = digital_out(Brain.ThreeWirePort.H);
 encoder lEncoder = encoder(Expander8.A);
 encoder rEncoder = encoder(Brain.ThreeWirePort.A);
 encoder mEncoder = encoder(Expander8.C);
+motor flywheel = motor(PORT9, ratio6_1, false);
+controller Controller1 = controller(primary);
 
 // VEXcode generated functions
-
-
+// define variable for remote controller enable/disable
+bool RemoteControlCodeEnabled = true;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
