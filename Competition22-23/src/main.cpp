@@ -168,8 +168,6 @@ void shoot(){
   Shooter.set(true);
   wait(0.3, sec);
   Shooter.set(false);
-  Blocker.set(true);
-  //return(1);
 }
 
 void expansion(){
@@ -420,15 +418,11 @@ void FullWin(){
 void autonomous(void) {
   FullWin();
   // OnRoller();
-  /*if(autonswitch.value(percent)<50){
-    OffRoller();
-  }else{
-    OnRoller();
-  }*/
-  //cosdrive(24, 50);
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  // if(autonswitch.value(percent)<50){
+  //   OffRoller();
+  // }else{
+  //   OnRoller();
+  // }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -507,10 +501,12 @@ void usercontrol(void) {
     if (Controller1.Axis4.value() != 0) {
       leftVal += Controller1.Axis4.value()/2;
       rightVal -= Controller1.Axis4.value()/2;
+      Blocker.set(true);
     }
     if (Controller1.Axis3.value() != 0) {
       leftVal += Controller1.Axis3.value();
       rightVal += Controller1.Axis3.value();
+      Blocker.set(true);
     }
     leftDrive.spin(fwd, leftVal, pct);
     rightDrive.spin(fwd, rightVal, pct);
