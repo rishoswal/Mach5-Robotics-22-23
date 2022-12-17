@@ -165,10 +165,10 @@ void autoshoot(float goalOffset){
   float goalAngle = 90 - (atan2(goalY - yPos, goalX - xPos) / degreesToRadians) + goalOffset;
   Controller1.Screen.print(goalAngle);
   turn(goalAngle);
-  wait(0.2, sec);
-  Shooter.set(true);
-  wait(0.3, sec);
-  Shooter.set(false);
+  // wait(0.2, sec);
+  // Shooter.set(true);
+  // wait(0.3, sec);
+  // Shooter.set(false);
   leftDrive.spin(forward);
   rightDrive.spin(forward);
 }
@@ -446,14 +446,16 @@ void FullWin(){
   rotateSpeed = 2650;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
-  turn(97);
+  turn(92);
   shoot();
   wait(1.5, seconds);
   shoot();
   turn(225);
-  cosdrive(20, 100);
+  Intake.spin(forward, 80, percent);
+  cosdrive(35, 100);
   leftDrive.setVelocity(100, percent);
   leftDrive.rotateFor(270, degrees);
+  Intake.stop();
   TurnRoller();
 
   rotateSpeed = 2000;
@@ -463,15 +465,39 @@ void FullWin(){
 }
 
 void Skills(){
-  task runPID(startup);
+  goalX = -89;
+  goalY = -11;
+
+  finalSpeed = 2300;
+  vex::task runPId(startup);
   TurnRoller();
-  cosdrive(-10, 30);
-  turn(90);
-  cosdrive(8, 25);
+    
+  motorRotate(-160, -160);
+  rightDrive.rotateFor(-300, degrees);
+  motorVelocity(100);
+  cosdrive(-110, 80);
+  enableFlyPID = true;
+  rotateSpeed = 2650;
+  enableLogistic = false;
+  vex::task runPID(FlyWheelPIDRPM);
+  turn(92);
+  shoot();
+  wait(1.5, seconds);
+  shoot();
+  turn(225);
+  Intake.spin(forward, 80, percent);
+  cosdrive(35, 70);
+  leftDrive.setVelocity(100, percent);
+  leftDrive.rotateFor(270, degrees);
+  Intake.stop();
   TurnRoller();
-  cosdrive(-10, 30);
+  motorRotate(-160, -160);
   turn(180);
-  cosdrive(40, 60);
+
+  rotateSpeed = 2000;
+  finalSpeed = 1800;
+  enableFlyPID = false;
+  Flywheel.stop(coast);
 
 }
 /*---------------------------------------------------------------------------*/
@@ -486,8 +512,9 @@ void Skills(){
 
 void autonomous(void) {
   thread startOdom(odometryInertial);
-  FullWin();
-  //OnRoller();
+  //FullWin();
+  // OnRoller();
+  Skills();
   // if(autonswitch.value(percent)<50){
   //   OffRoller();
   // }else{
@@ -596,7 +623,7 @@ void usercontrol(void) {
       Intake.stop(coast);
     }
     Controller1.ButtonR1.pressed(shoot);
-    if(Controller1.ButtonR2.pressing()){
+    if(Controller1.ButtonB.pressing()){
       Blocker.set(false);
       autoshoot(-10);
       waitUntil(!Controller1.ButtonR2.pressing());
@@ -610,11 +637,11 @@ void usercontrol(void) {
       }
       waitUntil(!Controller1.ButtonX.pressing());
     }
-    // if(Controller1.ButtonY.pressing()){
-    //   RightMidExpansion.set(true);
-    //   wait(5, sec);
-    //   LeftExpansion.set(true);
-    // }
+    if(Controller1.ButtonY.pressing()){
+      RightMidExpansion.set(true);
+      wait(1, sec);
+      LeftExpansion.set(true);
+    }
     //Brain.Screen.clearScreen();
     // Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
     // Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
