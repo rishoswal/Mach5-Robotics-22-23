@@ -41,12 +41,12 @@ motor_group rDrive(r1, r2, r3);
 float xPos = 0;
 float yPos = 0;
 float heading;
+float headingD;
 
-float angle;
-void turn(){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
-  float error = angle-(heading*1);
+void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
+  float error = angle-(headingD*1);
   while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
-    error = angle-(heading);//calculates error value
+    error = angle-(headingD);//calculates error value
     if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
       lDrive.spin(forward,36*(fabs(error)/error),percent);
       rDrive.spin(reverse,36*(fabs(error)/error),percent);
@@ -55,24 +55,24 @@ void turn(){ //function for turning. Spins with a speed cap of 36 percent, uses 
       rDrive.spin(reverse,error*0.73,percent);
     }
 
-    vex::this_thread::sleep_for(20);
+    wait(20, msec);
   }
   lDrive.stop();
   rDrive.stop();
 }
 
-void shoot(){
-  angle = 90 - (atan2(-54 - yPos, -54 - xPos) / degreesToRadians);
-  Controller1.Screen.print(angle);
-  vex::thread faceGoal(turn);
-  turn();
-  waitUntil(!Controller1.ButtonA.pressing());
+void shoot(float goalOffset){
+  float goalAngle = 90 - (atan2(-54 - yPos, 54 - xPos) / degreesToRadians) + goalOffset;
+  Controller1.Screen.print(goalAngle);
+  turn(goalAngle);
+  shoota.set(true);
+  wait(0.3, sec);
+  shoota.set(false);
+  lDrive.spin(forward);
+  rDrive.spin(forward);
 }
 
 void odometryInertial(){
-  float xPos = 0;
-  float yPos = 0;
-  float heading;
 
   float previousFB;
   float currentFB = 0;
@@ -92,14 +92,15 @@ void odometryInertial(){
     previousLR = currentLR;
     currentLR = mEncoder.position(degrees);
     changeLR = currentLR - previousLR;
-    heading = Inertial.heading() * degreesToRadians;
+    headingD = Inertial.heading(degrees);
+    heading = headingD * degreesToRadians;
 
     xPos += ((changeFB * sin(heading)) + (changeLR * cos(heading))) * degreesToInches;
     yPos += ((changeFB * cos(heading)) + (changeLR * sin(heading))) * degreesToInches;
 
     Brain.Screen.printAt(15, 25, "    x position: %f", xPos);
     Brain.Screen.printAt(15, 40, "    y position: %f", yPos);
-    Brain.Screen.printAt(15, 55, "       heading: %f", heading);
+    Brain.Screen.printAt(15, 55, "       heading: %f", headingD);
     Brain.Screen.printAt(15, 70, "  Left Encoder: %f", lEncoder.position(degrees));
     Brain.Screen.printAt(15, 85, " Right Encoder: %f", rEncoder.position(degrees));
     Brain.Screen.printAt(15, 100, "Middle Encoder: %f", mEncoder.position(degrees));
@@ -147,6 +148,7 @@ void odometry(){
 
     heading = (currentL - currentR) * degreesToInches / robotDiameter;
     changeFB = (changeL + changeR) * degreesToInches / 2;
+    headingD = heading / degreesToRadians;
 
     xPos += ((changeFB * sin(heading)) + (changeM * cos(heading)));
     yPos += ((changeFB * cos(heading)) - (changeM * sin(heading)));
@@ -154,14 +156,25 @@ void odometry(){
     Brain.Screen.printAt(15, 25, "      x position: %f", xPos);
     Brain.Screen.printAt(15, 40, "      y position: %f", yPos);
     Brain.Screen.printAt(15, 55, "   heading (rad): %f", heading);
-    Brain.Screen.printAt(15, 70, "   heading (deg): %f", heading/degreesToRadians);
+    Brain.Screen.printAt(15, 70, "   heading (deg): %f", headingD);
     Brain.Screen.printAt(15, 85, "    Left Encoder: %f", currentL);
     Brain.Screen.printAt(15, 100, "   Right Encoder: %f", currentR);
     Brain.Screen.printAt(15, 115, "  Middle Encoder: %f", currentM);
     Brain.Screen.printAt(15, 130, "  L/R Difference: %f", currentL - currentR);
-    //Brain.Screen.printAt(15, 130, "  thing: %f", atan(1));
 
-    vex::this_thread::sleep_for(20);
+    this_thread::sleep_for(20);
+  }
+}
+
+void autoPower(){
+  float goalDistance;
+
+  while(true){
+    goalDistance = sqrt(pow(xPos - 54, 2) + pow(yPos + 54, 2));
+
+    flywheel.spin(forward, goalDistance * 0.04 + 5, volt);
+
+    wait(50,msec);
   }
 }
 
@@ -169,10 +182,22 @@ int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  vex::thread runOdom(odometry);
+  thread runOdom(odometryInertial);
 
   while(true){
     lDrive.setVelocity((Controller1.Axis2.position() + Controller1.Axis4.position()) / 2, percent);
     rDrive.setVelocity((Controller1.Axis2.position() - Controller1.Axis4.position()) / 2, percent);
+
+    if(Controller1.ButtonA.pressing()){
+      shoot(-10);
+      waitUntil(!Controller1.ButtonA.pressing());
+    }
+
+    if(Controller1.ButtonB.pressing()){
+      thread startFlywheel(autoPower);
+      waitUntil(!Controller1.ButtonB.pressing());
+    }
+
+    wait(20, msec);
   }
 }

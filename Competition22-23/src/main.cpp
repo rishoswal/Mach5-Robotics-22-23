@@ -501,7 +501,6 @@ void usercontrol(void) {
     if (Controller1.Axis4.value() != 0) {
       leftVal += Controller1.Axis4.value()/2;
       rightVal -= Controller1.Axis4.value()/2;
-      Blocker.set(true);
     }
     if (Controller1.Axis3.value() != 0) {
       leftVal += Controller1.Axis3.value();
@@ -530,11 +529,11 @@ void usercontrol(void) {
     //Controller1.ButtonB.pressed(closeP);
     Controller1.ButtonR2.pressed(shoot);
     Controller1.ButtonB.pressed(expansion);
-    if(Controller1.ButtonY.pressing()){
-      RightMidExpansion.set(true);
-      wait(5, sec);
-      LeftExpansion.set(true);
-    }
+    // if(Controller1.ButtonY.pressing()){
+    //   RightMidExpansion.set(true);
+    //   wait(5, sec);
+    //   LeftExpansion.set(true);
+    // }
     //Brain.Screen.clearScreen();
     Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
     Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
