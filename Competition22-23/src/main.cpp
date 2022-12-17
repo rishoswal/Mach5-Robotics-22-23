@@ -65,9 +65,13 @@ float xPos = 0;
 float yPos = 0;
 float heading;
 float headingD;
+float goalX = 16;
+float goalY = -109;
 
 const float degreesToRadians = 2 * 3.141593 / 360.0;
 const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
+
+bool toggleAutoSpeed = false;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -134,9 +138,9 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 int endAngle=0; //driving forward will drift the back encoder unintentionally,
 //so we save the value of where we turned last and use it when turning again to ignore drift.
 void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
-  float error = angle-(Inertial.rotation(degrees));
+  float error = angle-(headingD);
   while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
-    error = angle-(Inertial.rotation(degrees));//calculates error value
+    error = angle-(headingD);//calculates error value
     if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
       leftDrive.spin(forward,36*(fabs(error)/error),percent);
       rightDrive.spin(reverse,36*(fabs(error)/error),percent);
@@ -158,9 +162,10 @@ void shoot(){
 }
 
 void autoshoot(float goalOffset){
-  float goalAngle = 90 - (atan2(-54 - yPos, 54 - xPos) / degreesToRadians) + goalOffset;
+  float goalAngle = 90 - (atan2(goalY - yPos, goalX - xPos) / degreesToRadians) + goalOffset;
   Controller1.Screen.print(goalAngle);
   turn(goalAngle);
+  wait(0.2, sec);
   Shooter.set(true);
   wait(0.3, sec);
   Shooter.set(false);
@@ -215,27 +220,29 @@ void pre_auton(void) {
 int FlyWheelPIDRPM() {
   int i = 0;
   while (enableFlyPID) {
-    diff = 0;
-    error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
-    derivative = error - prevError;
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);
-    Brain.Screen.clearLine();
-    diff = (error * kP) + (derivative * kD);
-    prevError = error;
-    currSpeed = Flywheel.velocity(rpm) - diff;
-    if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100){
-      Flywheel.spin(forward, currSpeed, rpm);
+    if(toggleAutoSpeed == false){
+      diff = 0;
+      error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
+      derivative = error - prevError;
+      // Brain.Screen.print(Flywheel.velocity(rpm)*6);
+      // Brain.Screen.clearLine();
+      diff = (error * kP) + (derivative * kD);
+      prevError = error;
+      currSpeed = Flywheel.velocity(rpm) - diff;
+      if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100){
+        Flywheel.spin(forward, currSpeed, rpm);
+      }
+      
+      // else {
+      //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
+      
+      //Brain.Screen.clearLine();
+      //Brain.Screen.print(Flywheel.voltage());
+      /*Flywheel.setVelocity(rotateSpeed/6, rpm);
+      Flywheel.spin(forward);
+      Brain.Screen.clearLine();
+      Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
     }
-    
-    // else {
-    //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
-    
-    //Brain.Screen.clearLine();
-    //Brain.Screen.print(Flywheel.voltage());
-    /*Flywheel.setVelocity(rotateSpeed/6, rpm);
-    Flywheel.spin(forward);
-    Brain.Screen.clearLine();
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
     vex::task::sleep(10);
     //i++;
   }
@@ -266,27 +273,28 @@ int Test(int startSpeed, int finalSpeed){
       counter -= 50;
     }
     wait(0.7, sec);
-    Brain.Screen.clearLine();
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    // Brain.Screen.clearLine();
+    // Brain.Screen.print(Flywheel.velocity(rpm)*6);
   }
   Flywheel.spin(forward);
   return 1;
 }
 
-int Startup(){
+int startup(){
 //Flywheel.spin(forward,50, rpm);
 //wait(5, sec);
   float counter = 0;
-  Brain.Screen.print(counter);
   while (Flywheel.velocity(rpm)*6 < finalSpeed && enableLogistic == true) {
-    //int flyrotation = Rotation.velocity(rpm);
-    Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
-    Flywheel.spin(forward);
-    //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
-    counter += 95;
+    if(toggleAutoSpeed == false){
+      //int flyrotation = Rotation.velocity(rpm);
+      Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
+      Flywheel.spin(forward);
+      //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
+      counter += 95;
+    }
     wait(0.7, sec);
-    Brain.Screen.clearLine();
-    Brain.Screen.print(Flywheel.velocity(rpm)*6);
+    // Brain.Screen.clearLine();
+    // Brain.Screen.print(Flywheel.velocity(rpm)*6);
   }
   //Flywheel.spin(forward, 7, volt);
   enableFlyPID = true;
@@ -331,33 +339,30 @@ void autoPower(){
   float goalDistance;
 
   while(true){
-    goalDistance = sqrt(pow(xPos - 54, 2) + pow(yPos + 54, 2));
+    if(toggleAutoSpeed){
+      goalDistance = sqrt(pow(xPos - goalX, 2) + pow(yPos - goalY, 2));
 
-    Flywheel.spin(forward, goalDistance * 0.04 + 5, volt);
+      Flywheel.spin(forward, goalDistance * 0.04 + 5, volt);
+    }
 
     wait(0.2, sec);
   }
 }
 
 void TurnRoller(){
-  right1.spin(forward);
-  right2.spin(forward);
-  right3.spin(forward);
-  left1.spin(forward);
-  left2.spin(forward);
-  left3.spin(forward);
+  leftDrive.spin(forward);
+  rightDrive.spin(forward);
   Intake.spinFor(reverse, 0.8, seconds);
-  right1.stop();
-  right2.stop();
-  right3.stop();
-  left1.stop();
-  left2.stop();
-  left3.stop();
+  leftDrive.stop();
+  rightDrive.stop();
 }
 
 void OnRoller(){
+  goalX = -89;
+  goalY = -11;
+
   finalSpeed = 2300;
-  vex::task runPId(Startup);
+  vex::task runPId(startup);
   //Intake.spinFor(forward, 220, degrees);
   //cosdrive(2, 50);
   TurnRoller();
@@ -386,8 +391,10 @@ void OnRoller(){
 }
 
 void OffRoller(){
+  goalX = -71;
+  goalY = 3;
   finalSpeed = 2090;
-  vex::task runPId(Startup);
+  vex::task runPId(startup);
   //Intake.spinFor(forward, 220, degrees);
   cosdrive(27, 50);
   turn(16.5);
@@ -422,8 +429,11 @@ void OffRoller(){
 }
 
 void FullWin(){
+  goalX = -89;
+  goalY = -11;
+
   finalSpeed = 2300;
-  vex::task runPId(Startup);
+  vex::task runPId(startup);
   //Intake.spinFor(forward, 220, degrees);
   //cosdrive(2, 50);
   TurnRoller();
@@ -450,6 +460,19 @@ void FullWin(){
   finalSpeed = 1800;
   enableFlyPID = false;
   Flywheel.stop(coast);
+}
+
+void Skills(){
+  task runPID(startup);
+  TurnRoller();
+  cosdrive(-10, 30);
+  turn(90);
+  cosdrive(8, 25);
+  TurnRoller();
+  cosdrive(-10, 30);
+  turn(180);
+  cosdrive(40, 60);
+
 }
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -484,25 +507,26 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  Blocker.set(true);
+  //Blocker.set(true);
+  thread startOdom(odometryInertial);
   while (1) {
       int leftVal = 0;
       int rightVal = 0;
-      Brain.Screen.clearLine();
-      Brain.Screen.print(left3.velocity(rpm));
+      // Brain.Screen.clearLine();
+      // Brain.Screen.print(left3.velocity(rpm));
       // if the axis 3 and axis 1's value is 0 the right and left wheel motors
       // should stop
 
     if (counter == 0){
-      vex::task runPID(Startup);
+      vex::task runPID(startup);
       counter ++;
     }
     
-    if(Controller1.ButtonR1.pressing()&&volts<11){
-      rotateSpeed += 75;
-      volts += 0.5;
-      wait(0.2, sec);
-    }
+    // if(Controller1.ButtonR1.pressing()&&volts<11){
+    //   rotateSpeed += 75;
+    //   volts += 0.5;
+    //   wait(0.2, sec);
+    // }
 
     if(Controller1.ButtonUp.pressing()){
       volts = 9.5;
@@ -540,12 +564,12 @@ void usercontrol(void) {
     //Flywheel.spin(forward, volts, volt);
     //vex::task FlyWheelPID();
 
-    vex::task runPID(FlyWheelPIDRPM); 
-    // thread startFlywheel(autoPower);
+    task runPID(FlyWheelPIDRPM); 
+    thread startFlywheel(autoPower);
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
       // when the axis 3 value is greater than zero the motor moves forward
-    Brain.Screen.clearLine();
+    // Brain.Screen.clearLine();
     if (Controller1.Axis4.value() != 0) {
       leftVal += Controller1.Axis4.value()/2;
       rightVal -= Controller1.Axis4.value()/2;
@@ -571,12 +595,21 @@ void usercontrol(void) {
     } else{
       Intake.stop(coast);
     }
-    Controller1.ButtonR2.pressed(shoot);
-    // if(Controller1.ButtonR2.pressing()){
-    //   autoshoot(-10);
-    //   waitUntil(!Controller1.ButtonR2.pressing());
-    // }
+    Controller1.ButtonR1.pressed(shoot);
+    if(Controller1.ButtonR2.pressing()){
+      Blocker.set(false);
+      autoshoot(-10);
+      waitUntil(!Controller1.ButtonR2.pressing());
+    }
     Controller1.ButtonB.pressed(expansion);
+    if(Controller1.ButtonX.pressing()){
+      if(toggleAutoSpeed){
+        toggleAutoSpeed = false;
+      }else{
+        toggleAutoSpeed = true;
+      }
+      waitUntil(!Controller1.ButtonX.pressing());
+    }
     // if(Controller1.ButtonY.pressing()){
     //   RightMidExpansion.set(true);
     //   wait(5, sec);
