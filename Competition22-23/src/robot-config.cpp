@@ -24,6 +24,9 @@ inertial Inertial = inertial(PORT3);
 potV2 autonswitch = potV2(expander.H);
 digital_out LeftExpansion = digital_out(expander.E);
 digital_out RightMidExpansion = digital_out(expander.G);
+encoder lEncoder = encoder(expander.A);
+encoder rEncoder = encoder(Brain.ThreeWirePort.A);
+encoder mEncoder = encoder(expander.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

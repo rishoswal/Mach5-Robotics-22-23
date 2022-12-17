@@ -19,6 +19,9 @@ extern triport expander;
 extern potV2 autonswitch;
 extern digital_out LeftExpansion;
 extern digital_out RightMidExpansion;
+extern encoder lEncoder;
+extern encoder rEncoder;
+extern encoder mEncoder;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

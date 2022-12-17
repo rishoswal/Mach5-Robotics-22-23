@@ -26,6 +26,9 @@
 // autonswitch          potV2         H               
 // LeftExpansion        digital_out   E               
 // RightMidExpansion    digital_out   G               
+// lEncoder             encoder       A, B            
+// rEncoder             encoder       A, B            
+// mEncoder             encoder       C, D            
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -57,6 +60,14 @@ bool enableVisionPID = false;
 bool enableFlyPID = false;
 float volts = 7.5;
 double heat;
+
+float xPos = 0;
+float yPos = 0;
+float heading;
+float headingD;
+
+const float degreesToRadians = 2 * 3.141593 / 360.0;
+const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -123,10 +134,9 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 int endAngle=0; //driving forward will drift the back encoder unintentionally,
 //so we save the value of where we turned last and use it when turning again to ignore drift.
 void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
-  //Inertial.setRotation(endAngle, degrees);
-  float error = angle-(Inertial.rotation(degrees)*1.0143);
-  while(fabs(error)>2||fabs(Inertial.gyroRate(zaxis, rpm))>1){ //exits loop if error <2 and rotational speed <1
-    error = angle-(Inertial.rotation(degrees)*1.0143);//calculates error value
+  float error = angle-(Inertial.rotation(degrees));
+  while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
+    error = angle-(Inertial.rotation(degrees));//calculates error value
     if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
       leftDrive.spin(forward,36*(fabs(error)/error),percent);
       rightDrive.spin(reverse,36*(fabs(error)/error),percent);
@@ -137,29 +147,6 @@ void turn(float angle){ //function for turning. Spins with a speed cap of 36 per
   }
   leftDrive.stop();
   rightDrive.stop();
-  Brain.Screen.printAt(1,20,"%f",Inertial.heading());
-  //endAngle=Inertial.heading();
-}
-
-void inertialRotate(int heading){
-  int newTurn = heading;
-  if ((Inertial.heading(degrees) < newTurn &&
-         newTurn - Inertial.heading(degrees) < 180) ||
-        (Inertial.heading(degrees) > newTurn &&
-         newTurn - Inertial.heading(degrees) > 180)) {
-      turnRight = 1;
-    } else {
-      turnRight = -1;
-    }
-  while (fabs(Inertial.heading(degrees) - newTurn) > 2) {
-    int spinFactor = fabs(Inertial.heading(degrees) - newTurn);
-    if (turnRight == -1) {
-      motorSpin(fwd, -1 * spinFactor - 20, spinFactor + 20);
-    } else {
-      motorSpin(fwd, spinFactor + 20, -1 * spinFactor - 20);
-    }
-  }
-motorStopAll(hold);
 }
 
 void shoot(){
@@ -168,6 +155,17 @@ void shoot(){
   Shooter.set(true);
   wait(0.3, sec);
   Shooter.set(false);
+}
+
+void autoshoot(float goalOffset){
+  float goalAngle = 90 - (atan2(-54 - yPos, 54 - xPos) / degreesToRadians) + goalOffset;
+  Controller1.Screen.print(goalAngle);
+  turn(goalAngle);
+  Shooter.set(true);
+  wait(0.3, sec);
+  Shooter.set(false);
+  leftDrive.spin(forward);
+  rightDrive.spin(forward);
 }
 
 void expansion(){
@@ -179,6 +177,8 @@ void expansion(){
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+
+  Inertial.calibrate();
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -291,6 +291,52 @@ int Startup(){
   //Flywheel.spin(forward, 7, volt);
   enableFlyPID = true;
   return 1;
+}
+
+void odometryInertial(){
+
+  float previousFB;
+  float currentFB = 0;
+  float changeFB;
+
+  float previousLR;
+  float currentLR = 0;
+  float changeLR;
+
+  while(true){
+    previousFB = currentFB;
+    currentFB = (lEncoder.position(degrees) + rEncoder.position(degrees)) / 2;
+    changeFB = currentFB - previousFB;
+    previousLR = currentLR;
+    currentLR = mEncoder.position(degrees);
+    changeLR = currentLR - previousLR;
+    headingD = Inertial.heading(degrees);
+    heading = headingD * degreesToRadians;
+
+    xPos += ((changeFB * sin(heading)) + (changeLR * cos(heading))) * degreesToInches;
+    yPos += ((changeFB * cos(heading)) + (changeLR * sin(heading))) * degreesToInches;
+
+    Brain.Screen.printAt(15, 25, "    x position: %f", xPos);
+    Brain.Screen.printAt(15, 40, "    y position: %f", yPos);
+    Brain.Screen.printAt(15, 55, "       heading: %f", headingD);
+    Brain.Screen.printAt(15, 70, "  Left Encoder: %f", lEncoder.position(degrees));
+    Brain.Screen.printAt(15, 85, " Right Encoder: %f", rEncoder.position(degrees));
+    Brain.Screen.printAt(15, 100, "Middle Encoder: %f", mEncoder.position(degrees));
+
+    wait(20, msec);
+  }
+}
+
+void autoPower(){
+  float goalDistance;
+
+  while(true){
+    goalDistance = sqrt(pow(xPos - 54, 2) + pow(yPos + 54, 2));
+
+    Flywheel.spin(forward, goalDistance * 0.04 + 5, volt);
+
+    wait(0.2, sec);
+  }
 }
 
 void TurnRoller(){
@@ -416,8 +462,9 @@ void FullWin(){
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  thread startOdom(odometryInertial);
   FullWin();
-  // OnRoller();
+  //OnRoller();
   // if(autonswitch.value(percent)<50){
   //   OffRoller();
   // }else{
@@ -450,7 +497,7 @@ void usercontrol(void) {
       vex::task runPID(Startup);
       counter ++;
     }
-    //while(true){
+    
     if(Controller1.ButtonR1.pressing()&&volts<11){
       rotateSpeed += 75;
       volts += 0.5;
@@ -489,11 +536,12 @@ void usercontrol(void) {
       rotateSpeed = 0;
     }
 
-    // Generally, 7 to 10 volts is a good range for all distances on th field
+    // Generally, 7 to 10 volts is a good range for all distances on the field
     //Flywheel.spin(forward, volts, volt);
     //vex::task FlyWheelPID();
 
     vex::task runPID(FlyWheelPIDRPM); 
+    // thread startFlywheel(autoPower);
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
       // when the axis 3 value is greater than zero the motor moves forward
@@ -505,18 +553,16 @@ void usercontrol(void) {
     if (Controller1.Axis3.value() != 0) {
       leftVal += Controller1.Axis3.value();
       rightVal += Controller1.Axis3.value();
-      Blocker.set(true);
+      if(abs(Controller1.Axis3.value()) > 10){
+        Blocker.set(true);
+      }
     }
     leftDrive.spin(fwd, leftVal, pct);
     rightDrive.spin(fwd, rightVal, pct);
-  //    Brain.Screen.print(Controller1.Axis3.value());
-    //  Brain.Screen.print(" ");
-      //Brain.Screen.print(Controller1.Axis4.value());
+  
     if (Controller1.Axis3.value() == 0 && Controller1.Axis4.value() == 0) {
         leftDrive.stop(coast);
         rightDrive.stop(coast);
-          //Brain.Screen.print(1);
-          //Brain.Screen.clearLine();
     }
     if (Controller1.Axis2.value() >= 10){
       Intake.spin(forward, 100, percent);
@@ -525,9 +571,11 @@ void usercontrol(void) {
     } else{
       Intake.stop(coast);
     }
-    //Controller1.ButtonA.pressed(openP);
-    //Controller1.ButtonB.pressed(closeP);
     Controller1.ButtonR2.pressed(shoot);
+    // if(Controller1.ButtonR2.pressing()){
+    //   autoshoot(-10);
+    //   waitUntil(!Controller1.ButtonR2.pressing());
+    // }
     Controller1.ButtonB.pressed(expansion);
     // if(Controller1.ButtonY.pressing()){
     //   RightMidExpansion.set(true);
@@ -535,16 +583,16 @@ void usercontrol(void) {
     //   LeftExpansion.set(true);
     // }
     //Brain.Screen.clearScreen();
-    Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
-    Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
-    Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
-    Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
-    Brain.Screen.printAt(15, 85, "        RPM: %f", Flywheel.velocity(rpm)*6);
-    Brain.Screen.printAt(15, 100, "Efficiency; %f", Flywheel.efficiency());
-    Brain.Screen.printAt(15, 115, " Heat Loss: %f", heat);
-    Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
-    Controller1.Screen.setCursor(1,1);
-    Controller1.Screen.print("%.2f",volts);
+    // Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
+    // Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
+    // Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
+    // Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
+    // Brain.Screen.printAt(15, 85, "        RPM: %f", Flywheel.velocity(rpm)*6);
+    // Brain.Screen.printAt(15, 100, "Efficiency; %f", Flywheel.efficiency());
+    // Brain.Screen.printAt(15, 115, " Heat Loss: %f", heat);
+    // Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
+    // Controller1.Screen.setCursor(1,1);
+    // Controller1.Screen.print("%.2f",volts);
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
