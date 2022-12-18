@@ -73,6 +73,8 @@ const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter
 
 bool toggleAutoSpeed = false;
 
+timer expandTimer;
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -352,7 +354,7 @@ void autoPower(){
 void TurnRoller(){
   leftDrive.spin(forward);
   rightDrive.spin(forward);
-  Intake.spinFor(reverse, 0.8, seconds);
+  Intake.spinFor(reverse, 1, seconds);
   leftDrive.stop();
   rightDrive.stop();
 }
@@ -366,20 +368,20 @@ void OnRoller(){
   //Intake.spinFor(forward, 220, degrees);
   //cosdrive(2, 50);
   TurnRoller();
-    
   motorRotate(-160, -160);
+
   rightDrive.rotateFor(-350, degrees);
   motorRotate(-100, -100);
-  turn(158);
+  turn(155);
 
-  wait(3, seconds);
+  wait(0.5, seconds);
   
   enableFlyPID = true;
-  rotateSpeed = 2650;
+  rotateSpeed = 2600;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
     
-  wait(2.5, sec);
+  wait(1.5, sec);
   shoot();
   //rotateSpeed = rotateSpeed -= 80;
   wait(1.5, seconds);
@@ -393,35 +395,38 @@ void OnRoller(){
 void OffRoller(){
   goalX = -71;
   goalY = 3;
-  finalSpeed = 2090;
+  finalSpeed = 2200;
   vex::task runPId(startup);
   //Intake.spinFor(forward, 220, degrees);
   cosdrive(27, 50);
-  turn(16.5);
+  turn(18);
 
   //motorRotate(-75, 75);
-  wait(2.5, seconds);
+  wait(1.5, seconds);
   
   enableFlyPID = true;
   //volts = 9.5;
-  rotateSpeed = 2530;
+  rotateSpeed = 2560;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
   
-  wait(2.5, sec);
+  wait(1.5, sec);
   shoot();
   //rotateSpeed = rotateSpeed += 80;
-  turn(16.5);
-  wait(2.5, seconds);
+  //turn(16.5);
+  wait(1.5, seconds);
   shoot();
 
   rightDrive.setVelocity(100, percent);
   rightDrive.rotateFor(-40, degrees);
-  turn(143);
-  cosdrive(40, 100);
-  leftDrive.setVelocity(100, percent);
-  leftDrive.rotateFor(270, degrees);
-  TurnRoller();
+  turn(135);
+  cosdrive(45, 100);
+  leftDrive.spinFor(0.9, sec, 200, rpm);
+  Intake.spin(forward, 80, percent);
+  leftDrive.spin(forward);
+  rightDrive.spinFor(forward, 2, sec);
+  leftDrive.stop();
+  rightDrive.stop();
   rotateSpeed = 2000;
   finalSpeed = 1800;
   enableFlyPID = false;
@@ -513,12 +518,16 @@ void Skills(){
 void autonomous(void) {
   thread startOdom(odometryInertial);
   //FullWin();
-  // OnRoller();
-  Skills();
-  // if(autonswitch.value(percent)<50){
+  OffRoller();
+  //Skills();
+  // if(autonswitch.value(percent)<25){
   //   OffRoller();
-  // }else{
+  // }else if(autonswitch.value(percent)<50){
   //   OnRoller();
+  // }else if(autonswitch.value(percent)<75){
+  //   FullWin();
+  // }else{
+  //   Skills();
   // }
 }
 
@@ -536,6 +545,7 @@ void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
   thread startOdom(odometryInertial);
+  expandTimer.reset();
   while (1) {
       int leftVal = 0;
       int rightVal = 0;
@@ -582,10 +592,10 @@ void usercontrol(void) {
       //wait(0.2, sec);
 
     }
-    if(Controller1.ButtonDown.pressing()){
-      volts=0;
-      rotateSpeed = 0;
-    }
+    // if(Controller1.ButtonDown.pressing()){
+    //   volts=0;
+    //   rotateSpeed = 0;
+    // }
 
     // Generally, 7 to 10 volts is a good range for all distances on the field
     //Flywheel.spin(forward, volts, volt);
@@ -629,15 +639,15 @@ void usercontrol(void) {
       waitUntil(!Controller1.ButtonR2.pressing());
     }
     Controller1.ButtonB.pressed(expansion);
-    if(Controller1.ButtonX.pressing()){
-      if(toggleAutoSpeed){
-        toggleAutoSpeed = false;
-      }else{
-        toggleAutoSpeed = true;
-      }
-      waitUntil(!Controller1.ButtonX.pressing());
-    }
-    if(Controller1.ButtonY.pressing()){
+    // if(Controller1.ButtonX.pressing()){
+    //   if(toggleAutoSpeed){
+    //     toggleAutoSpeed = false;
+    //   }else{
+    //     toggleAutoSpeed = true;
+    //   }
+    //   waitUntil(!Controller1.ButtonX.pressing());
+    // }
+    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
       RightMidExpansion.set(true);
       wait(1, sec);
       LeftExpansion.set(true);
