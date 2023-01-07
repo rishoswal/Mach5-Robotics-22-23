@@ -22,6 +22,7 @@ extern digital_out RightMidExpansion;
 extern encoder lEncoder;
 extern encoder rEncoder;
 extern encoder mEncoder;
+extern digital_out Flap;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

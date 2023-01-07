@@ -19,7 +19,7 @@ motor right2 = motor(PORT17, ratio18_1, true);
 motor right3 = motor(PORT12, ratio18_1, true);
 digital_out Blocker = digital_out(Brain.ThreeWirePort.H);
 digital_out Shooter = digital_out(Brain.ThreeWirePort.G);
-motor Intake = motor(PORT14, ratio18_1, false);
+motor Intake = motor(PORT10, ratio18_1, false);
 inertial Inertial = inertial(PORT3);
 potV2 autonswitch = potV2(expander.H);
 digital_out LeftExpansion = digital_out(expander.E);
@@ -27,6 +27,7 @@ digital_out RightMidExpansion = digital_out(expander.G);
 encoder lEncoder = encoder(expander.A);
 encoder rEncoder = encoder(Brain.ThreeWirePort.A);
 encoder mEncoder = encoder(expander.C);
+digital_out Flap = digital_out(Brain.ThreeWirePort.C);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

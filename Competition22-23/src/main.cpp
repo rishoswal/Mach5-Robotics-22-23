@@ -20,7 +20,7 @@
 // right3               motor         12              
 // Blocker              digital_out   H               
 // Shooter              digital_out   G               
-// Intake               motor         14              
+// Intake               motor         10              
 // Inertial             inertial      3               
 // expander             triport       8               
 // autonswitch          potV2         H               
@@ -29,6 +29,7 @@
 // lEncoder             encoder       A, B            
 // rEncoder             encoder       A, B            
 // mEncoder             encoder       C, D            
+// Flap                 digital_out   C               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -48,7 +49,7 @@ int flySpeed;
 
 int counter = 0;
 int finalSpeed = 1800;
-int rotateSpeed = 2000;
+int rotateSpeed = 2300;
 int error;
 int prevError;
 int derivative;
@@ -566,14 +567,13 @@ void usercontrol(void) {
     // }
 
     if(Controller1.ButtonUp.pressing()){
-      volts = 9.5;
-      rotateSpeed = 2650;
+      //volts = 9.5;
+      rotateSpeed += 75;
       wait(0.2, sec);
     }
   
     if(Controller1.ButtonDown.pressing()){
-      volts=7.5;
-      rotateSpeed = 2000;
+      rotateSpeed -= 75;
       //enableFlyPID=false;
       //Flywheel.spin(forward, 2000/6, rpm);
       //wait(0.2, sec);
@@ -582,9 +582,8 @@ void usercontrol(void) {
 
     }
 
-    if(Controller1.ButtonL1.pressing()&&volts>0){
-      volts-=0.5;
-      rotateSpeed -= 75;
+    if(Controller1.ButtonRight.pressing()&&volts>0){
+      rotateSpeed = 2300;
       //enableFlyPID=false;
       //Flywheel.spin(forward, rotateSpeed/6, volt);
       //wait(0.2, sec);
@@ -625,14 +624,14 @@ void usercontrol(void) {
         leftDrive.stop(coast);
         rightDrive.stop(coast);
     }
-    if (Controller1.Axis2.value() >= 10){
+    if (Controller1.ButtonR2.pressing()){
       Intake.spin(forward, 100, percent);
-    } else if (Controller1.Axis2.value() <= -10){
+    } else if (Controller1.ButtonR1.pressing()){ 
       Intake.spin(reverse, 100, percent);
     } else{
       Intake.stop(coast);
     }
-    Controller1.ButtonR1.pressed(shoot);
+    //Controller1.ButtonR1.pressed(shoot);
     if(Controller1.ButtonB.pressing()){
       Blocker.set(false);
       autoshoot(-10);
@@ -651,6 +650,12 @@ void usercontrol(void) {
       RightMidExpansion.set(true);
       wait(1, sec);
       LeftExpansion.set(true);
+    }
+    if(Controller1.ButtonL2.pressing()){
+      Flap.set(false);
+    }
+    if(Controller1.ButtonL1.pressing()){
+      Flap.set(true);
     }
     //Brain.Screen.clearScreen();
     // Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
