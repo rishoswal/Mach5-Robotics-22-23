@@ -48,8 +48,8 @@ double kD = 0.003;
 int flySpeed;
 
 int counter = 0;
-int finalSpeed = 1800;
-int rotateSpeed = 2300;
+int finalSpeed = 1700;
+int rotateSpeed = 2200;
 int error;
 int prevError;
 int derivative;
@@ -383,13 +383,14 @@ void Skills(){
   thread display(printHeading);
   vex::task runPId(startup);
   //Inertial.setHeading(, degrees);
-  fullDrive.spinFor(reverse, 0.2, sec, 100, rpm);
   Intake.spin(forward, 100, percent);
+  fullDrive.spinFor(reverse, 0.4, sec, 100, rpm);
   wait(1, sec);
-  rightDrive.spinFor(340, degrees, 60, rpm);
+  rightDrive.spinFor(150, degrees, 60, rpm);
+  turn(-45);
   cosdrive(19, 35);
   turn(90);
-  fullDrive.spinFor(reverse, 0.8, sec, 40, rpm);
+  fullDrive.spinFor(reverse, 1.1, sec, 40, rpm);
   wait(1, sec);
   Intake.stop();
   
@@ -403,16 +404,16 @@ void Skills(){
   turn(0);
   cosdrive(50, 68);
   Flap.set(true);
-  turn(-23);
+  turn(-13);
   Intake.spinFor(reverse, 0.4, sec, 70, rpm);
-  rotateSpeed = 2500;
+  rotateSpeed = 2600;
   Intake.spinFor(reverse, 2.5, sec, 70, rpm);
   wait(0.2, sec);
   rotateSpeed = 2300;
   enableFlyPID = false;
   
   //turn(0);
-  cosdrive(-6, 10);
+  cosdrive(-5.5, 10);
   turn(88.5);
   Intake.spin(forward, 100, percent);
   cosdrive(99, 65);
@@ -441,14 +442,17 @@ void Skills(){
   cosdrive(69, 68);
   rotateSpeed = 2300;
   Flap.set(true);
-  turn(-206);
-  Intake.spinFor(reverse, 0.9, sec, 70, rpm);
-  rotateSpeed = 2300;
-  wait(0.5, sec);
-  Intake.spinFor(reverse, 0.9, sec, 70, rpm);
-  rotateSpeed = 2300;
-  wait(0.5, sec);
-  Intake.spinFor(reverse, 1.2, sec, 70, rpm);
+  turn(-196);
+  // Intake.spinFor(reverse, 0.9, sec, 70, rpm);
+  // rotateSpeed = 2300;
+  // wait(0.5, sec);
+  // Intake.spinFor(reverse, 0.9, sec, 70, rpm);
+  // rotateSpeed = 2300;
+  // wait(0.5, sec);
+  // Intake.spinFor(reverse, 1.2, sec, 70, rpm);
+  Intake.spinFor(reverse, 0.4, sec, 70, rpm);
+  rotateSpeed = 2600;
+  Intake.spinFor(reverse, 2.5, sec, 70, rpm);
   wait(0.2, sec);
   rotateSpeed = 2300;
 
@@ -510,10 +514,10 @@ void usercontrol(void) {
       // if the axis 3 and axis 1's value is 0 the right and left wheel motors
       // should stop
 
-    // if (counter == 0){
-    //   vex::task runPID(startup);
-    //   counter ++;
-    // }
+     if (counter == 0){
+       vex::task runPID(startup);
+       counter ++;
+     }
     
     // if(Controller1.ButtonR1.pressing()&&volts<11){
     //   rotateSpeed += 75;
@@ -559,15 +563,15 @@ void usercontrol(void) {
     //Flywheel.spin(forward, volts, volt);
     //vex::task FlyWheelPID();
 
-    // task runPID(FlyWheelPIDRPM); 
+     task runPID(FlyWheelPIDRPM); 
     // thread startFlywheel(autoPower);
     heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
       // when the axis 3 value is greater than zero the motor moves forward
     // Brain.Screen.clearLine();
-    if (Controller1.Axis4.value() != 0) {
-      leftVal += Controller1.Axis4.value()/2;
-      rightVal -= Controller1.Axis4.value()/2;
+    if (Controller1.Axis1.value() != 0) {
+      leftVal += Controller1.Axis1.value()/2;
+      rightVal -= Controller1.Axis1.value()/2;
     }
     if (Controller1.Axis3.value() != 0) {
       leftVal += Controller1.Axis3.value();
@@ -579,7 +583,7 @@ void usercontrol(void) {
     leftDrive.spin(fwd, leftVal, pct);
     rightDrive.spin(fwd, rightVal, pct);
   
-    if (Controller1.Axis3.value() == 0 && Controller1.Axis4.value() == 0) {
+    if (Controller1.Axis3.value() == 0 && Controller1.Axis1.value() == 0) {
         leftDrive.stop(coast);
         rightDrive.stop(coast);
     }
