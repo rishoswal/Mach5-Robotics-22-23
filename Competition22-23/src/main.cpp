@@ -18,11 +18,10 @@
 // right1               motor         16              
 // right2               motor         17              
 // right3               motor         12              
-// Blocker              digital_out   H               
 // Shooter              digital_out   G               
 // Intake               motor         10              
 // Inertial             inertial      3               
-// expander             triport       8               
+// expander             triport       5               
 // autonswitch          potV2         H               
 // LeftExpansion        digital_out   E               
 // RightMidExpansion    digital_out   G               
@@ -30,6 +29,7 @@
 // rEncoder             encoder       A, B            
 // mEncoder             encoder       C, D            
 // Flap                 digital_out   C               
+// Vision               vision        4               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -73,6 +73,8 @@ const float degreesToRadians = 2 * 3.141593 / 360.0;
 const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
 
 bool toggleAutoSpeed = false;
+
+float greatestDrivePower;
 
 timer expandTimer;
 
@@ -124,8 +126,6 @@ void turn(float angle){ //function for turning. Spins with a speed cap of 36 per
 }
 
 void shoot(){
-  Blocker.set(false);
-  wait(0.3, sec);
   Shooter.set(true);
   wait(0.3, sec);
   Shooter.set(false);
@@ -425,11 +425,9 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
-  thread startOdom(odometryInertial);
+  //thread startOdom(odometryInertial);
   expandTimer.reset();
-  while (1) {
-      int leftVal = 0;
-      int rightVal = 0;
+  while (true) {
 
      if (counter == 0){
        vex::task runPID(startup);
@@ -443,38 +441,33 @@ void usercontrol(void) {
     if(Controller1.ButtonUp.pressing()){
       //volts = 9.5;
       rotateSpeed += 75;
-      wait(0.2, sec);
+      Controller1.Screen.print(rotateSpeed);
+      waitUntil(!Controller1.ButtonUp.pressing());
     }
   
     if(Controller1.ButtonDown.pressing()){
       rotateSpeed -= 75;
+      Controller1.Screen.print(rotateSpeed);
+      waitUntil(!Controller1.ButtonDown.pressing());
     }
 
     if(Controller1.ButtonRight.pressing()){
-      rotateSpeed = 2300;
+      rotateSpeed = 2450;
+      Controller1.Screen.print(rotateSpeed);
     }
-
-    //vex::task FlyWheelPID();
 
      task runPID(FlyWheelPIDRPM); 
     // thread startFlywheel(autoPower);
-    heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
+    //heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
-      // when the axis 3 value is greater than zero the motor moves forward
-    // Brain.Screen.clearLine();
-    if (Controller1.Axis1.value() != 0) {
-      leftVal += Controller1.Axis1.value()/2;
-      rightVal -= Controller1.Axis1.value()/2;
+    greatestDrivePower = abs(Controller1.Axis3.position()) + abs(Controller1.Axis1.position());
+    if(greatestDrivePower > 100){
+      greatestDrivePower = 100/greatestDrivePower;
+    }else{
+      greatestDrivePower = 1;
     }
-    if (Controller1.Axis3.value() != 0) {
-      leftVal += Controller1.Axis3.value();
-      rightVal += Controller1.Axis3.value();
-      if(abs(Controller1.Axis3.value()) > 10){
-        Blocker.set(true);
-      }
-    }
-    leftDrive.spin(fwd, leftVal, pct);
-    rightDrive.spin(fwd, rightVal, pct);
+    leftDrive.spin(forward, (Controller1.Axis3.position() + Controller1.Axis1.position()) * greatestDrivePower, percent);
+    rightDrive.spin(forward, (Controller1.Axis3.position() - Controller1.Axis1.position()) * greatestDrivePower, percent);
   
     if (Controller1.Axis3.value() == 0 && Controller1.Axis1.value() == 0) {
         leftDrive.stop(coast);
@@ -489,7 +482,6 @@ void usercontrol(void) {
     }
     //Controller1.ButtonR1.pressed(shoot);
     if(Controller1.ButtonB.pressing()){
-      Blocker.set(false);
       autoshoot(-10);
       waitUntil(!Controller1.ButtonR2.pressing());
     }
@@ -506,12 +498,15 @@ void usercontrol(void) {
       wait(1, sec);
       LeftExpansion.set(true);
     }
-    if(Controller1.ButtonL2.pressing()){
-      Flap.set(false);
-    }
     if(Controller1.ButtonL1.pressing()){
-      Flap.set(true);
+      if(Flap.value()){
+        Flap.set(false);
+      }else{
+        Flap.set(true);
+      }
+      waitUntil(!Controller1.ButtonL1.pressing());
     }
+    Controller1.Screen.setCursor(1, 1);
     //Brain.Screen.clearScreen();
     // Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
     // Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
@@ -523,14 +518,6 @@ void usercontrol(void) {
     // Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
     // Controller1.Screen.setCursor(1,1);
     // Controller1.Screen.print("%.2f",volts);
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
