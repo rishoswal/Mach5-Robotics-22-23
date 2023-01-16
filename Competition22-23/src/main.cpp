@@ -89,40 +89,6 @@ motor_group leftDrive(left3, left2, left1);
 motor_group rightDrive(right1, right2, right3);
 motor_group fullDrive(left1, left2, left3, right1, right2, right3);
 
-void motorStopAll(brakeType mode) {
-
-  rightDrive.stop(mode);
-  leftDrive.stop(mode);
-}
-// Spin all the motors base on direction (fwd or reverse), left motor speed, and
-// right motor speed
-void motorSpin(directionType dir, double speedLeft, double speedRight) {
-  leftDrive.spin(dir, speedLeft, pct);
-  //frontLeftMotor.spin(dir, speedLeft, pct);
-  rightDrive.spin(dir, speedRight, pct);
- // backRightMotor.spin(dir, speedRight, pct);
-}
-// Rotate all the motors in degrees for left and right motors
-void motorRotate(double degreeLeft, double degreeRight) {
-  right1.startRotateFor(degreeRight, degrees);
-  //backRightMotor.startRotateFor(degreeRight, degrees);
-  right2.startRotateFor(degreeRight, degrees);
-  right3.startRotateFor(degreeRight, degrees);
-  left1.startRotateFor(degreeLeft, degrees);
-  left3.startRotateFor(degreeLeft, degrees);
-  left2.rotateFor(degreeLeft, degrees);
-  // wait(0.5, sec);
-}
-
-void motorVelocity(int newVelocity){
-  right1.setVelocity(newVelocity, percent);
-  right2.setVelocity(newVelocity, percent);
-  right3.setVelocity(newVelocity, percent);
-  left1.setVelocity(newVelocity, percent);
-  left2.setVelocity(newVelocity, percent);
-  left3.setVelocity(newVelocity, percent);
-}
-
 timer drivetimer;
 void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
 // better explanation and visualization here: https://www.desmos.com/calculator/begor0sggm
@@ -177,12 +143,6 @@ void autoshoot(float goalOffset){
   rightDrive.spin(forward);
 }
 
-void expansion(){
-  /*Blocker.set(true);
-  wait(0.3, sec);
-  Blocker.set(false);*/
-}
-
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
@@ -196,42 +156,11 @@ void pre_auton(void) {
   right2.setBrake(coast);
   right3.setBrake(coast);
 
-
-
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
 
-/*int FlyWheelPID() {
-  int i = 0;
-  while (enableFlyPID) {
-    diff = 0;
-    error = Flywheel.voltage() - (volts-(volts*0.1));
-    derivative = error - prevError;
-    diff = (error * kP) + (derivative * kD);
-    prevError = error;
-    currSpeed = Flywheel.voltage() - diff;
-    if (Flywheel.voltage() < volts - 0.35){
-      Flywheel.spin(forward, volts, volt);
-    }
-    
-    // else {
-    //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
-    
-    //Brain.Screen.clearLine();
-    //Brain.Screen.print(Flywheel.voltage());
-    //Flywheel.setVelocity(rotateSpeed/6, rpm);
-    //Flywheel.spin(forward);
-    //Brain.Screen.clearLine();
-    //Brain.Screen.print(Flywheel.velocity(rpm)*6);
-    vex::task::sleep(10);
-    //i++;
-  }
-  return(1);
-}*/
-
 int FlyWheelPIDRPM() {
-  int i = 0;
   while (enableFlyPID) {
     if(toggleAutoSpeed == false){
       diff = 0;
@@ -248,16 +177,8 @@ int FlyWheelPIDRPM() {
       
       // else {
       //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
-      
-      //Brain.Screen.clearLine();
-      //Brain.Screen.print(Flywheel.voltage());
-      /*Flywheel.setVelocity(rotateSpeed/6, rpm);
-      Flywheel.spin(forward);
-      Brain.Screen.clearLine();
-      Brain.Screen.print(Flywheel.velocity(rpm)*6);*/
     }
     vex::task::sleep(10);
-    //i++;
   }
   return(1);
 }
@@ -509,21 +430,11 @@ void usercontrol(void) {
   while (1) {
       int leftVal = 0;
       int rightVal = 0;
-      // Brain.Screen.clearLine();
-      // Brain.Screen.print(left3.velocity(rpm));
-      // if the axis 3 and axis 1's value is 0 the right and left wheel motors
-      // should stop
 
      if (counter == 0){
        vex::task runPID(startup);
        counter ++;
      }
-    
-    // if(Controller1.ButtonR1.pressing()&&volts<11){
-    //   rotateSpeed += 75;
-    //   volts += 0.5;
-    //   wait(0.2, sec);
-    // }
 
     if(Controller1.ButtonA.pressing()){
       tripleshot();
@@ -537,30 +448,12 @@ void usercontrol(void) {
   
     if(Controller1.ButtonDown.pressing()){
       rotateSpeed -= 75;
-      //enableFlyPID=false;
-      //Flywheel.spin(forward, 2000/6, rpm);
-      //wait(0.2, sec);
-      //enableFlyPID = true;
-      //wait(0.2, sec);
-
     }
 
-    if(Controller1.ButtonRight.pressing()&&volts>0){
+    if(Controller1.ButtonRight.pressing()){
       rotateSpeed = 2300;
-      //enableFlyPID=false;
-      //Flywheel.spin(forward, rotateSpeed/6, volt);
-      //wait(0.2, sec);
-      //enableFlyPID = true;
-      //wait(0.2, sec);
-
     }
-    // if(Controller1.ButtonDown.pressing()){
-    //   volts=0;
-    //   rotateSpeed = 0;
-    // }
 
-    // Generally, 7 to 10 volts is a good range for all distances on the field
-    //Flywheel.spin(forward, volts, volt);
     //vex::task FlyWheelPID();
 
      task runPID(FlyWheelPIDRPM); 
@@ -600,7 +493,6 @@ void usercontrol(void) {
       autoshoot(-10);
       waitUntil(!Controller1.ButtonR2.pressing());
     }
-    Controller1.ButtonB.pressed(expansion);
     // if(Controller1.ButtonX.pressing()){
     //   if(toggleAutoSpeed){
     //     toggleAutoSpeed = false;
