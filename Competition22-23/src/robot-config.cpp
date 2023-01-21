@@ -24,12 +24,13 @@ potV2 autonswitch = potV2(expander.H);
 digital_out LeftExpansion = digital_out(expander.E);
 digital_out RightMidExpansion = digital_out(expander.G);
 encoder lEncoder = encoder(expander.A);
-encoder rEncoder = encoder(Brain.ThreeWirePort.A);
+encoder rEncoder = encoder(Brain.ThreeWirePort.E);
 encoder mEncoder = encoder(expander.C);
 digital_out Flap = digital_out(Brain.ThreeWirePort.C);
 /*vex-vision-config:begin*/
 vision Vision = vision (PORT4, 50);
 /*vex-vision-config:end*/
+digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

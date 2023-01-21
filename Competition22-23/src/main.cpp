@@ -26,10 +26,11 @@
 // LeftExpansion        digital_out   E               
 // RightMidExpansion    digital_out   G               
 // lEncoder             encoder       A, B            
-// rEncoder             encoder       A, B            
+// rEncoder             encoder       E, F            
 // mEncoder             encoder       C, D            
 // Flap                 digital_out   C               
 // Vision               vision        4               
+// Expansion            digital_out   B               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -43,13 +44,13 @@ competition Competition;
 double kP = 0.03;
 int turnRight;
 double kI = 0.0;
-double kD = 0.003;
+double kD = 0.0035;
 
 int flySpeed;
 
 int counter = 0;
-int finalSpeed = 1700;
-int rotateSpeed = 2200;
+int finalSpeed = 1800;
+int rotateSpeed = 2400;
 int error;
 int prevError;
 int derivative;
@@ -285,11 +286,12 @@ void autoPower(){
 
 
 void tripleshot(){
-  rotateSpeed = 2500;
-  Intake.spin(reverse, 50, percent);
-  wait(2, seconds);
-  Intake.stop(coast);
-  rotateSpeed = 2300;
+  Intake.spinFor(reverse, 0.5, sec, 70, rpm);
+  wait(0.15, sec);
+  rotateSpeed = 3400;
+  Intake.spinFor(reverse, 1.2, sec, 70, rpm);
+  wait(0.2, sec);
+  rotateSpeed = 2400;
 }
 
 void printHeading(){
@@ -317,7 +319,7 @@ void Skills(){
   
   enableFlyPID = true;
   //volts = 9.5;
-  rotateSpeed = 2300;
+  rotateSpeed = 2500;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
   
@@ -330,7 +332,7 @@ void Skills(){
   rotateSpeed = 2600;
   Intake.spinFor(reverse, 2.5, sec, 70, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2300;
+  rotateSpeed = 2500;
   enableFlyPID = false;
   
   //turn(0);
@@ -358,10 +360,10 @@ void Skills(){
   Intake.stop();
 
   enableFlyPID = true;
-  rotateSpeed = 2300;
+  rotateSpeed = 2500;
   vex::task runpID(FlyWheelPIDRPM);
   cosdrive(69, 68);
-  rotateSpeed = 2300;
+  rotateSpeed = 2500;
   Flap.set(true);
   turn(-196);
   // Intake.spinFor(reverse, 0.9, sec, 70, rpm);
@@ -375,7 +377,7 @@ void Skills(){
   rotateSpeed = 2600;
   Intake.spinFor(reverse, 2.5, sec, 70, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2300;
+  rotateSpeed = 2500;
 
   
   turn(-180);
@@ -452,7 +454,7 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonRight.pressing()){
-      rotateSpeed = 2450;
+      rotateSpeed = 2500;
       Controller1.Screen.print(rotateSpeed);
     }
 
@@ -493,10 +495,8 @@ void usercontrol(void) {
     //   }
     //   waitUntil(!Controller1.ButtonX.pressing());
     // }
-    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
-      RightMidExpansion.set(true);
-      wait(1, sec);
-      LeftExpansion.set(true);
+    if(Controller1.ButtonY.pressing()){
+      Expansion.set(true);
     }
     if(Controller1.ButtonL1.pressing()){
       if(Flap.value()){
