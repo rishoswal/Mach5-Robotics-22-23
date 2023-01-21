@@ -31,6 +31,7 @@ digital_out Flap = digital_out(Brain.ThreeWirePort.C);
 vision Vision = vision (PORT4, 50);
 /*vex-vision-config:end*/
 digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
+optical rollerColor = optical(PORT8);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

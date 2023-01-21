@@ -31,6 +31,7 @@
 // Flap                 digital_out   C               
 // Vision               vision        4               
 // Expansion            digital_out   B               
+// rollerColor          optical       8               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -74,6 +75,7 @@ const float degreesToRadians = 2 * 3.141593 / 360.0;
 const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
 
 bool toggleAutoSpeed = false;
+bool autospinning = false;
 
 float greatestDrivePower;
 
@@ -144,11 +146,28 @@ void autoshoot(float goalOffset){
   rightDrive.spin(forward);
 }
 
+void rollNextColor(){
+  if(rollerColor.isNearObject()){
+    autospinning = true;
+    if(rollerColor.hue() < 100){
+      while(rollerColor.hue() < 100){
+        Intake.spin(forward, 50, percent);
+      }
+    }else{
+      while(rollerColor.hue() > 100){
+        Intake.spin(forward, 50, percent);
+      }
+    }
+    autospinning = false;
+  }
+}
+
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
   Inertial.calibrate();
+  rollerColor.setLightPower(10);
 
   left1.setBrake(coast);
   left2.setBrake(coast);
@@ -428,13 +447,16 @@ void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
   //thread startOdom(odometryInertial);
+  if(Controller1.Axis4.position()<50){
+    if (counter == 0){
+      task runPID(startup);
+      counter ++;
+    }
+    task runPID(FlyWheelPIDRPM); 
+  }
+  
   expandTimer.reset();
   while (true) {
-
-     if (counter == 0){
-       vex::task runPID(startup);
-       counter ++;
-     }
 
     if(Controller1.ButtonA.pressing()){
       tripleshot();
@@ -457,8 +479,6 @@ void usercontrol(void) {
       rotateSpeed = 2500;
       Controller1.Screen.print(rotateSpeed);
     }
-
-     task runPID(FlyWheelPIDRPM); 
     // thread startFlywheel(autoPower);
     //heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
@@ -479,9 +499,15 @@ void usercontrol(void) {
       Intake.spin(forward, 100, percent);
     } else if (Controller1.ButtonR1.pressing()){ 
       Intake.spin(reverse, 50, percent);
-    } else{
+    } else if(!autospinning){
       Intake.stop(coast);
     }
+
+    if(Controller1.ButtonL2.pressing()){
+      thread roll(rollNextColor);
+      waitUntil(!Controller1.ButtonL2.pressing());
+    }
+
     //Controller1.ButtonR1.pressed(shoot);
     if(Controller1.ButtonB.pressing()){
       autoshoot(-10);
@@ -516,6 +542,7 @@ void usercontrol(void) {
     // Brain.Screen.printAt(15, 100, "Efficiency; %f", Flywheel.efficiency());
     // Brain.Screen.printAt(15, 115, " Heat Loss: %f", heat);
     // Brain.Screen.printAt(15, 130, "Resistance: %f", Flywheel.voltage()/Flywheel.current());
+    Brain.Screen.printAt(15, 145, "     Color: %f", rollerColor.hue());
     // Controller1.Screen.setCursor(1,1);
     // Controller1.Screen.print("%.2f",volts);
 

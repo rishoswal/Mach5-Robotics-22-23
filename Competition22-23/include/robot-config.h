@@ -33,6 +33,7 @@ extern signature Vision__SIG_6;
 extern signature Vision__SIG_7;
 extern vision Vision;
 extern digital_out Expansion;
+extern optical rollerColor;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
