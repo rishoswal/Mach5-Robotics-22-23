@@ -308,11 +308,11 @@ void autoPower(){
 
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 70, rpm);
-  wait(0.15, sec);
   rotateSpeed = 3400;
+  wait(0.05, sec);
   Intake.spinFor(reverse, 1.2, sec, 70, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2400;
+  rotateSpeed = 2250;
 }
 
 void printHeading(){
@@ -328,8 +328,10 @@ void Skills(){
   thread display(printHeading);
   vex::task runPId(startup);
   //Inertial.setHeading(, degrees);
-  Intake.spin(forward, 100, percent);
-  fullDrive.spinFor(reverse, 0.4, sec, 100, rpm);
+  //Intake.spin(forward, 100, percent);
+  fullDrive.spinFor(reverse, 0.2, sec, 50, rpm);
+  thread roll(rollNextColor);
+  //Brain.Screen.print("Hello");
   wait(1, sec);
   rightDrive.spinFor(150, degrees, 60, rpm);
   turn(-45);
@@ -407,6 +409,8 @@ void Skills(){
   turn(-135);
   cosdrive(-15, 20);
 
+  Expansion.set(true);
+
 
 }
 
@@ -450,13 +454,13 @@ void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
   //thread startOdom(odometryInertial);
-  if(Controller1.Axis4.position()<50){
-    if (counter == 0){
-      task runPID(startup);
-      counter ++;
-    }
-    task runPID(FlyWheelPIDRPM); 
-  }
+   if(Controller1.Axis4.position()<50){
+     if (counter == 0){
+       task runPID(startup);
+       counter ++;
+     }
+     task runPID(FlyWheelPIDRPM); 
+   }
   
   expandTimer.reset();
   while (true) {
@@ -499,6 +503,7 @@ void usercontrol(void) {
         leftDrive.stop(coast);
         rightDrive.stop(coast);
     }
+    
     if (Controller1.ButtonR2.pressing()){
       Intake.spin(forward, 100, percent);
     } else if (Controller1.ButtonR1.pressing()){ 
@@ -513,10 +518,10 @@ void usercontrol(void) {
     }
 
     //Controller1.ButtonR1.pressed(shoot);
-    if(Controller1.ButtonB.pressing()){
-      autoshoot(-10);
-      waitUntil(!Controller1.ButtonR2.pressing());
-    }
+    // if(Controller1.ButtonB.pressing()){
+    //   autoshoot(-10);
+    //   waitUntil(!Controller1.ButtonR2.pressing());
+    // }
     // if(Controller1.ButtonX.pressing()){
     //   if(toggleAutoSpeed){
     //     toggleAutoSpeed = false;
@@ -528,6 +533,12 @@ void usercontrol(void) {
     if(Controller1.ButtonY.pressing()){
       Expansion.set(true);
     }
+
+    if(Controller1.ButtonX.pressing()){
+      Expansion.set(false);
+    }
+
+
     if(Controller1.ButtonL1.pressing()){
       if(Flap.value()){
         Flap.set(false);
