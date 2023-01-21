@@ -51,7 +51,8 @@ int flySpeed;
 
 int counter = 0;
 int finalSpeed = 1800;
-int rotateSpeed = 2400;
+int rotateSpeed = 2250;
+int powerLevel = 3;
 int error;
 int prevError;
 int derivative;
@@ -151,11 +152,11 @@ void rollNextColor(){
     autospinning = true;
     if(rollerColor.hue() < 100){
       while(rollerColor.hue() < 100){
-        Intake.spin(forward, 50, percent);
+        Intake.spin(forward, 60, percent);
       }
     }else{
       while(rollerColor.hue() > 100){
-        Intake.spin(forward, 50, percent);
+        Intake.spin(forward, 60, percent);
       }
     }
     autospinning = false;
@@ -181,7 +182,8 @@ void pre_auton(void) {
 }
 
 int FlyWheelPIDRPM() {
-  while (enableFlyPID) {
+  waitUntil(enableFlyPID);
+  while (true) {
     if(toggleAutoSpeed == false){
       diff = 0;
       error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
@@ -320,6 +322,7 @@ void printHeading(){
     wait(50, msec);
   }
 }
+
 
 void Skills(){
   thread display(printHeading);
@@ -464,21 +467,22 @@ void usercontrol(void) {
 
     if(Controller1.ButtonUp.pressing()){
       //volts = 9.5;
-      rotateSpeed += 75;
-      Controller1.Screen.print(rotateSpeed);
+      powerLevel++;
       waitUntil(!Controller1.ButtonUp.pressing());
     }
   
     if(Controller1.ButtonDown.pressing()){
-      rotateSpeed -= 75;
-      Controller1.Screen.print(rotateSpeed);
+      powerLevel--;
       waitUntil(!Controller1.ButtonDown.pressing());
     }
 
     if(Controller1.ButtonRight.pressing()){
-      rotateSpeed = 2500;
-      Controller1.Screen.print(rotateSpeed);
+      powerLevel = 3;
     }
+
+    rotateSpeed = 2025 + (75*powerLevel);
+    Controller1.Screen.print(powerLevel);
+
     // thread startFlywheel(autoPower);
     //heat = (Flywheel.voltage()*Flywheel.current()) - (Flywheel.torque()*Flywheel.velocity(dps)*0.3142);
 
