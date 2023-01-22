@@ -1,0 +1,225 @@
+#include "vex.h"
+
+using namespace vex;
+
+motor_group leftDrive(left3, left2, left1);
+motor_group rightDrive(right1, right2, right3);
+motor_group fullDrive(left1, left2, left3, right1, right2, right3);
+
+
+//---------------- AUTONOMOUS DRIVING ------------------------------------------------------------------------------
+
+
+timer drivetimer;
+void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
+// better explanation and visualization here: https://www.desmos.com/calculator/begor0sggm
+	double velocity;
+  double seconds=fabs((3.5*inches)/speed); //calculates the time the robot will take to complete a cycle based on the wheel
+  //circumference, gear ratio, target distance, and motor speed.
+  drivetimer.reset();
+  while(drivetimer.time(sec)<seconds){
+    velocity=(1-cos((6.283*drivetimer.time(sec))/seconds))*speed/2 * (fabs(inches)/inches); //uses equation for the cosine wave to calculate velocity.
+    leftDrive.spin(forward,velocity,percent);
+		rightDrive.spin(forward,velocity,percent);
+	}                                                                                                                                                              
+	leftDrive.stop();
+	rightDrive.stop();
+}
+
+int endAngle=0; //driving forward will drift the back encoder unintentionally,
+//so we save the value of where we turned last and use it when turning again to ignore drift.
+void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
+  float error = angle-(Inertial.rotation());
+  while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
+    error = angle-(Inertial.rotation());//calculates error value
+    if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
+      leftDrive.spin(forward,36*(fabs(error)/error),percent);
+      rightDrive.spin(reverse,36*(fabs(error)/error),percent);
+    }else{
+      leftDrive.spin(forward,error*0.73,percent);
+      rightDrive.spin(reverse,error*0.73,percent);
+    }
+  }
+  leftDrive.stop();
+  rightDrive.stop();
+}
+
+
+//--------------------- FLYWHEEL ---------------------------------------------------------------
+
+int counter = 0;
+int finalSpeed = 1800;
+int rotateSpeed = 2250;
+int powerLevel = 3;
+int error;
+int prevError;
+int derivative;
+int integral;
+int diff;
+int currSpeed;
+bool enableLogistic = true;
+bool enableVisionPID = false;
+bool enableFlyPID = false;
+
+double kP = 0.03;
+double kI = 0.0;
+double kD = 0.0035;
+
+bool toggleAutoSpeed = false;
+
+int startup(){
+//Flywheel.spin(forward,50, rpm);
+//wait(5, sec);
+  float counter = 0;
+  while (Flywheel.velocity(rpm)*6 < finalSpeed && enableLogistic == true) {
+    if(toggleAutoSpeed == false){
+      //int flyrotation = Rotation.velocity(rpm);
+      Flywheel.setVelocity(((finalSpeed/6)+50)/(1+ pow(2.71828, (-0.006)*(counter - 480))), rpm);
+      Flywheel.spin(forward);
+      //Flywheel.spin(forward, 600/(1+ pow(2.71828, (-0.006)*(counter - 480))) , rpm);
+      counter += 95;
+    }
+    wait(0.7, sec);
+    // Brain.Screen.clearLine();
+    // Brain.Screen.print(Flywheel.velocity(rpm)*6);
+  }
+  //Flywheel.spin(forward, 7, volt);
+  enableFlyPID = true;
+  return 1;
+}
+
+int FlyWheelPIDRPM() {
+  waitUntil(enableFlyPID);
+  while (true) {
+    if(toggleAutoSpeed == false){
+      diff = 0;
+      error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
+      derivative = error - prevError;
+      // Brain.Screen.print(Flywheel.velocity(rpm)*6);
+      // Brain.Screen.clearLine();
+      diff = (error * kP) + (derivative * kD);
+      prevError = error;
+      currSpeed = Flywheel.velocity(rpm) - diff;
+      if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100){
+        Flywheel.spin(forward, currSpeed, rpm);
+      }
+      
+      // else {
+      //  Flywheel.spin(forward, Flywheel.velocity(rpm) - diff, rpm
+    }
+    vex::task::sleep(10);
+  }
+  return(1);
+}
+
+
+//-------------------- ODOMETRY ----------------------------------------------------------
+
+
+float xPos = 0;
+float yPos = 0;
+float heading;
+float headingD;
+float goalX = 16;
+float goalY = -109;
+
+const float degreesToRadians = 2 * 3.141593 / 360.0;
+const float degreesToInches = 2.75 * 3.141593 / 360.0; //with a 2.75 in diameter wheel
+
+void odometryInertial(){
+
+  float previousFB;
+  float currentFB = 0;
+  float changeFB;
+
+  float previousLR;
+  float currentLR = 0;
+  float changeLR;
+
+  while(true){
+    previousFB = currentFB;
+    currentFB = (lEncoder.position(degrees) + rEncoder.position(degrees)) / 2;
+    changeFB = currentFB - previousFB;
+    previousLR = currentLR;
+    currentLR = mEncoder.position(degrees);
+    changeLR = currentLR - previousLR;
+    headingD = Inertial.heading(degrees);
+    heading = headingD * degreesToRadians;
+
+    xPos += ((changeFB * sin(heading)) + (changeLR * cos(heading))) * degreesToInches;
+    yPos += ((changeFB * cos(heading)) + (changeLR * sin(heading))) * degreesToInches;
+
+    Brain.Screen.printAt(15, 25, "    x position: %f", xPos);
+    Brain.Screen.printAt(15, 40, "    y position: %f", yPos);
+    Brain.Screen.printAt(15, 55, "       heading: %f", headingD);
+    Brain.Screen.printAt(15, 70, "  Left Encoder: %f", lEncoder.position(degrees));
+    Brain.Screen.printAt(15, 85, " Right Encoder: %f", rEncoder.position(degrees));
+    Brain.Screen.printAt(15, 100, "Middle Encoder: %f", mEncoder.position(degrees));
+
+    wait(20, msec);
+  }
+}
+
+void autoshoot(float goalOffset){
+  float goalAngle = 90 - (atan2(goalY - yPos, goalX - xPos) / degreesToRadians) + goalOffset;
+  Controller1.Screen.print(goalAngle);
+  turn(goalAngle);
+  // wait(0.2, sec);
+  // Shooter.set(true);
+  // wait(0.3, sec);
+  // Shooter.set(false);
+  leftDrive.spin(forward);
+  rightDrive.spin(forward);
+}
+
+void autoPower(){
+  float goalDistance;
+
+  while(true){
+    if(toggleAutoSpeed){
+      goalDistance = sqrt(pow(xPos - goalX, 2) + pow(yPos - goalY, 2));
+
+      Flywheel.spin(forward, goalDistance * 0.04 + 5, volt);
+    }
+
+    wait(0.2, sec);
+  }
+}
+
+
+//------------------- DRIVER -----------------------------------------------------------
+
+
+bool autospinning = false;
+void rollNextColor(){
+  if(rollerColor.isNearObject()){
+    autospinning = true;
+    if(rollerColor.hue() < 100){
+      while(rollerColor.hue() < 100){
+        Intake.spin(forward, 60, percent);
+      }
+    }else{
+      while(rollerColor.hue() > 100){
+        Intake.spin(forward, 60, percent);
+      }
+    }
+    autospinning = false;
+  }
+}
+
+void tripleshot(){
+  Intake.spinFor(reverse, 0.5, sec, 70, rpm);
+  rotateSpeed = 3400;
+  wait(0.05, sec);
+  Intake.spinFor(reverse, 1.2, sec, 70, rpm);
+  wait(0.2, sec);
+  rotateSpeed = 2250;
+}
+
+void printHeading(){
+  while(1){
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(Inertial.heading());
+    wait(50, msec);
+  }
+}

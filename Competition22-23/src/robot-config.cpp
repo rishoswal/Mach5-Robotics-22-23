@@ -17,7 +17,6 @@ motor left3 = motor(PORT18, ratio18_1, false);
 motor right1 = motor(PORT16, ratio18_1, true);
 motor right2 = motor(PORT17, ratio18_1, true);
 motor right3 = motor(PORT12, ratio18_1, true);
-digital_out Shooter = digital_out(Brain.ThreeWirePort.G);
 motor Intake = motor(PORT10, ratio18_1, false);
 inertial Inertial = inertial(PORT3);
 potV2 autonswitch = potV2(expander.H);
@@ -28,7 +27,14 @@ encoder rEncoder = encoder(Brain.ThreeWirePort.E);
 encoder mEncoder = encoder(expander.C);
 digital_out Flap = digital_out(Brain.ThreeWirePort.C);
 /*vex-vision-config:begin*/
-vision Vision = vision (PORT4, 50);
+signature goalCam__REDGOAL = signature (1, 11423, 12867, 12145, -1953, -1311, -1632, 10.7, 0);
+signature goalCam__SIG_2 = signature (2, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__SIG_3 = signature (3, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__SIG_4 = signature (4, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__SIG_6 = signature (6, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__SIG_7 = signature (7, 0, 0, 0, 0, 0, 0, 3, 0);
+vision goalCam = vision (PORT4, 150, goalCam__REDGOAL, goalCam__SIG_2, goalCam__SIG_3, goalCam__SIG_4, goalCam__SIG_5, goalCam__SIG_6, goalCam__SIG_7);
 /*vex-vision-config:end*/
 digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
 optical rollerColor = optical(PORT8);
