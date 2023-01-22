@@ -117,6 +117,8 @@ void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
   //thread startOdom(odometryInertial);
+  thread viewVision(visionAim);
+
    if(Controller1.Axis4.position()<50){
      if (counter == 0){
        task runPID(startup);
@@ -198,7 +200,8 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonX.pressing()){
-      Expansion.set(false);
+      const int targetX = 162;
+      turn(Inertial.yaw() - (0.25 * (targetX-centerX)));
     }
 
 

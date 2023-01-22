@@ -223,3 +223,41 @@ void printHeading(){
     wait(50, msec);
   }
 }
+
+int centerX;
+void visionAim(){
+  int higherObject;
+  float goalDistance;
+
+  while(true){
+    Brain.Screen.clearScreen();
+    Brain.Screen.setOrigin(1, 1);
+    Brain.Screen.drawRectangle(0, 0, 316, 212);
+
+    goalCam.takeSnapshot(goalCam__REDGOAL);
+    if(goalCam.objects[1].exists){
+      if(goalCam.objects[0].centerY < goalCam.objects[1].centerY){
+        higherObject = 0;
+      }else{
+        higherObject = 1;
+      }
+      Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
+      Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
+    }else{
+      higherObject = 0;
+      Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
+    }
+
+    // https://www.desmos.com/calculator/imonsqlj9j calculate distance
+    goalDistance = 5.3 * pow(1.0125, (goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height)) + 4;
+    centerX = goalCam.objects[higherObject].centerX;
+
+    Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
+    Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
+    Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
+    Brain.Screen.printAt(320, 65, "center X: %d", centerX);
+    Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
+
+    wait(0.2, sec);
+  }
+}
