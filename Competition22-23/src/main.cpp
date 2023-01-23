@@ -21,7 +21,6 @@
 // Intake               motor         10              
 // Inertial             inertial      3               
 // expander             triport       5               
-// autonswitch          potV2         H               
 // LeftExpansion        digital_out   E               
 // RightMidExpansion    digital_out   G               
 // lEncoder             encoder       A, B            
@@ -31,6 +30,7 @@
 // goalCam              vision        4               
 // Expansion            digital_out   B               
 // rollerColor          optical       8               
+// colorSwitch          potV2         G               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -178,7 +178,7 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonL2.pressing()){
-      thread roll(rollNextColor);
+      thread roll(rollToColor);
       waitUntil(!Controller1.ButtonL2.pressing());
     }
 

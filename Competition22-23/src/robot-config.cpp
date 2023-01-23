@@ -19,7 +19,6 @@ motor right2 = motor(PORT17, ratio18_1, true);
 motor right3 = motor(PORT12, ratio18_1, true);
 motor Intake = motor(PORT10, ratio18_1, false);
 inertial Inertial = inertial(PORT3);
-potV2 autonswitch = potV2(expander.H);
 digital_out LeftExpansion = digital_out(expander.E);
 digital_out RightMidExpansion = digital_out(expander.G);
 encoder lEncoder = encoder(expander.A);
@@ -38,6 +37,7 @@ vision goalCam = vision (PORT4, 150, goalCam__REDGOAL, goalCam__BLUEGOAL, goalCa
 /*vex-vision-config:end*/
 digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
 optical rollerColor = optical(PORT8);
+potV2 colorSwitch = potV2(Brain.ThreeWirePort.G);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

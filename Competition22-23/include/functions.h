@@ -216,6 +216,22 @@ void rollNextColor(){
   }
 }
 
+void rollToColor(){
+  if(rollerColor.isNearObject()){
+    autospinning = true;
+    if(colorSwitch.value(percent) < 50){
+      while(rollerColor.hue() < 100){
+        Intake.spin(forward, 60, percent);
+      }
+    }else{
+      while(rollerColor.hue() > 100){
+        Intake.spin(forward, 60, percent);
+      }
+    }
+    autospinning = false;
+  }
+}
+
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 70, rpm);
   rotateSpeed = 3400;
@@ -237,7 +253,11 @@ void visionAim(){
     Brain.Screen.setOrigin(1, 1);
     Brain.Screen.drawRectangle(0, 0, 316, 212);
 
-    goalCam.takeSnapshot(goalCam__REDGOAL);
+    if(colorSwitch.value(percent)<50){
+      goalCam.takeSnapshot(goalCam__REDGOAL);
+    }else{
+      goalCam.takeSnapshot(goalCam__BLUEGOAL);
+    }
     if(goalCam.objects[1].exists){
       if(goalCam.objects[0].centerY < goalCam.objects[1].centerY){
         higherObject = 0;
