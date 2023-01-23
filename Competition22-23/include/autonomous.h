@@ -8,36 +8,42 @@ void Skills(){
   //Inertial.setHeading(, degrees);
   //Intake.spin(forward, 100, percent);
   fullDrive.spinFor(reverse, 0.2, sec, 50, rpm);
-  thread roll(rollNextColor);
-  //Brain.Screen.print("Hello");
-  wait(1, sec);
+  fullDrive.stop(hold);
+  rollNextColor();
+  //wait(1, sec);
   rightDrive.spinFor(150, degrees, 60, rpm);
-  turn(-45);
-  cosdrive(23, 35);
+  Intake.spin(forward, 100,percent);
+  turn(-38);
+  cosdrive(26, 35);
   turn(90);
-  fullDrive.spinFor(reverse, 1.1, sec, 40, rpm);
-  wait(1, sec);
   Intake.stop();
+  fullDrive.spinFor(reverse, 0.5, sec, 40, rpm);
+  fullDrive.stop(hold);
+  rollNextColor();
+  //wait(1, sec);
+  //Intake.stop();
   
   enableFlyPID = true;
   //volts = 9.5;
-  rotateSpeed = 2250;
+  rotateSpeed = 2280;
   enableLogistic = false;
   vex::task runPID(FlyWheelPIDRPM);
   
-  cosdrive(12, 25);
+  cosdrive(16, 25);
+  Intake.spin(forward, 100, percent);
   turn(0);
   cosdrive(50, 68);
   Flap.set(true);
-  turn(-13);
+  turn(-11);
+  Intake.stop();
   tripleshot();
   enableFlyPID = false;
   
   //turn(0);
   cosdrive(-5.5, 10);
-  turn(88.5);
+  turn(87);
   Intake.spin(forward, 100, percent);
-  cosdrive(99, 65);
+  cosdrive(103, 65);
   turn(0);
   cosdrive(56, 65);
   wait(1, sec);
@@ -58,10 +64,10 @@ void Skills(){
   Intake.stop();
 
   enableFlyPID = true;
-  rotateSpeed = 2250;
+  rotateSpeed = 2280;
   vex::task runpID(FlyWheelPIDRPM);
   cosdrive(69, 68);
-  rotateSpeed = 2250;
+  rotateSpeed = 2280;
   Flap.set(true);
   turn(-196);
   // Intake.spinFor(reverse, 0.9, sec, 70, rpm);

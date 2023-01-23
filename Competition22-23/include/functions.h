@@ -29,9 +29,11 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 int endAngle=0; //driving forward will drift the back encoder unintentionally,
 //so we save the value of where we turned last and use it when turning again to ignore drift.
 void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
-  float error = angle-(Inertial.rotation());
+  float trueRotation = Inertial.rotation() * 1.0227;
+  float error = angle-(trueRotation);
   while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
-    error = angle-(Inertial.rotation());//calculates error value
+    trueRotation = Inertial.rotation() * 1.0227;
+    error = angle-(trueRotation);//calculates error value
     if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
       leftDrive.spin(forward,36*(fabs(error)/error),percent);
       rightDrive.spin(reverse,36*(fabs(error)/error),percent);
@@ -44,12 +46,20 @@ void turn(float angle){ //function for turning. Spins with a speed cap of 36 per
   rightDrive.stop();
 }
 
+void printHeading(){
+  while(1){
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(Inertial.rotation() * 1.0227);
+    wait(50, msec);
+  }
+}
+
 
 //--------------------- FLYWHEEL ---------------------------------------------------------------
 
 int counter = 0;
 int finalSpeed = 1800;
-int rotateSpeed = 2250;
+int rotateSpeed = 2280;
 int powerLevel = 3;
 int error;
 int prevError;
@@ -213,16 +223,9 @@ void tripleshot(){
   wait(0.05, sec);
   Intake.spinFor(reverse, 1.2, sec, 70, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2250;
+  rotateSpeed = 2280;
 }
 
-void printHeading(){
-  while(1){
-    Controller1.Screen.setCursor(1, 1);
-    Controller1.Screen.print(Inertial.heading());
-    wait(50, msec);
-  }
-}
 
 int centerX;
 void visionAim(){
