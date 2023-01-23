@@ -28,13 +28,13 @@ encoder mEncoder = encoder(expander.C);
 digital_out Flap = digital_out(Brain.ThreeWirePort.C);
 /*vex-vision-config:begin*/
 signature goalCam__REDGOAL = signature (1, 11423, 12867, 12145, -1953, -1311, -1632, 10.7, 0);
-signature goalCam__SIG_2 = signature (2, 0, 0, 0, 0, 0, 0, 3, 0);
+signature goalCam__BLUEGOAL = signature (2, -4229, -2213, -3222, 12375, 18245, 15310, 3, 0);
 signature goalCam__SIG_3 = signature (3, 0, 0, 0, 0, 0, 0, 3, 0);
 signature goalCam__SIG_4 = signature (4, 0, 0, 0, 0, 0, 0, 3, 0);
 signature goalCam__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 3, 0);
 signature goalCam__SIG_6 = signature (6, 0, 0, 0, 0, 0, 0, 3, 0);
 signature goalCam__SIG_7 = signature (7, 0, 0, 0, 0, 0, 0, 3, 0);
-vision goalCam = vision (PORT4, 150, goalCam__REDGOAL, goalCam__SIG_2, goalCam__SIG_3, goalCam__SIG_4, goalCam__SIG_5, goalCam__SIG_6, goalCam__SIG_7);
+vision goalCam = vision (PORT4, 150, goalCam__REDGOAL, goalCam__BLUEGOAL, goalCam__SIG_3, goalCam__SIG_4, goalCam__SIG_5, goalCam__SIG_6, goalCam__SIG_7);
 /*vex-vision-config:end*/
 digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
 optical rollerColor = optical(PORT8);

@@ -24,7 +24,7 @@ extern encoder rEncoder;
 extern encoder mEncoder;
 extern digital_out Flap;
 extern signature goalCam__REDGOAL;
-extern signature goalCam__SIG_2;
+extern signature goalCam__BLUEGOAL;
 extern signature goalCam__SIG_3;
 extern signature goalCam__SIG_4;
 extern signature goalCam__SIG_5;

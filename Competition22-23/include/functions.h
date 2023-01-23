@@ -59,7 +59,7 @@ void printHeading(){
 
 int counter = 0;
 int finalSpeed = 1800;
-int rotateSpeed = 2280;
+int rotateSpeed = 2375;
 int powerLevel = 3;
 int error;
 int prevError;
@@ -68,7 +68,6 @@ int integral;
 int diff;
 int currSpeed;
 bool enableLogistic = true;
-bool enableVisionPID = false;
 bool enableFlyPID = false;
 
 double kP = 0.03;
@@ -223,7 +222,8 @@ void tripleshot(){
   wait(0.05, sec);
   Intake.spinFor(reverse, 1.2, sec, 70, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2280;
+  Flywheel.spin(forward, 2375, rpm);
+  rotateSpeed = 2375;
 }
 
 
