@@ -203,14 +203,27 @@ bool autospinning = false;
 void rollNextColor(){
   if(rollerColor.isNearObject()){
     autospinning = true;
-    if(rollerColor.hue() < 100){
-      while(rollerColor.hue() < 100){
-        Intake.spin(forward, 60, percent);
+    if(rollerColor.hue() < 300 and rollerColor.hue() > 190){
+      while(rollerColor.hue() < 300 and rollerColor.hue() > 190){
+        Intake.spin(forward, 45, percent);
       }
     }else{
-      while(rollerColor.hue() > 100){
-        Intake.spin(forward, 60, percent);
+      while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
+        Intake.spin(forward, 45, percent);
       }
+    }
+    autospinning = false;
+  }
+}
+
+void rollRed(){
+  if(rollerColor.isNearObject()){
+    autospinning = true;
+    if(rollerColor.hue() > 300 or rollerColor.hue() < 100){
+      while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
+        Intake.spin(forward, 45, percent);
+      }
+      Intake.stop();
     }
     autospinning = false;
   }
@@ -234,12 +247,13 @@ void rollToColor(){
 
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 70, rpm);
-  rotateSpeed = 3400;
-  wait(0.05, sec);
+  rotateSpeed = 3450;
+  wait(0.125, sec);
   Intake.spinFor(reverse, 1.2, sec, 70, rpm);
-  wait(0.2, sec);
+  //wait(0.2, sec);
   Flywheel.spin(forward, 2375, rpm);
-  rotateSpeed = 2375;
+  wait(0.1, sec);
+  rotateSpeed = 2355;
 }
 
 

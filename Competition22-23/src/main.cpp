@@ -130,6 +130,7 @@ void usercontrol(void) {
   expandTimer.reset();
   while (true) {
 
+
     if(Controller1.ButtonA.pressing()){
       tripleshot();
     }
@@ -149,7 +150,7 @@ void usercontrol(void) {
       powerLevel = 3;
     }
 
-    rotateSpeed = 2025 + (75*powerLevel);
+    rotateSpeed = 2130 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);
@@ -214,8 +215,8 @@ void usercontrol(void) {
       waitUntil(!Controller1.ButtonL1.pressing());
     }
     Controller1.Screen.setCursor(1, 1);
-    //Brain.Screen.clearScreen();
-    // Brain.Screen.printAt(15, 25, "Volts input: %f", volts);
+    Brain.Screen.clearScreen();
+     Brain.Screen.printAt(15, 20, "Hue: %f", rollerColor.hue());
     // Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
     // Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
     // Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());
