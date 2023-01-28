@@ -132,7 +132,7 @@ void usercontrol(void) {
 
 
     if(Controller1.ButtonA.pressing()){
-      tripleshot();
+      thread Shoot(tripleshot)  ;
     }
 
     if(Controller1.ButtonUp.pressing()){
@@ -150,7 +150,7 @@ void usercontrol(void) {
       powerLevel = 3;
     }
 
-    rotateSpeed = 2130 + (75*powerLevel);
+    rotateSpeed = 2030 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);

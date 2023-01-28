@@ -219,9 +219,9 @@ void rollNextColor(){
 void rollRed(){
   if(rollerColor.isNearObject()){
     autospinning = true;
-    if(rollerColor.hue() > 300 or rollerColor.hue() < 100){
+    if(rollerColor.hue() > 300 or rollerColor.hue() < 200){
       while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
-        Intake.spin(forward, 45, percent);
+        Intake.spin(forward, 100, percent);
       }
       Intake.stop();
     }
@@ -251,9 +251,9 @@ void tripleshot(){
   wait(0.125, sec);
   Intake.spinFor(reverse, 1.2, sec, 70, rpm);
   //wait(0.2, sec);
-  Flywheel.spin(forward, 2375, rpm);
-  wait(0.1, sec);
-  rotateSpeed = 2355;
+  Flywheel.spin(forward, 2000, rpm);
+  wait(0.15, sec);
+  rotateSpeed = 2255;
 }
 
 
@@ -297,4 +297,36 @@ void visionAim(){
 
     wait(0.2, sec);
   }
+}
+
+
+//------------------- 15 Seconds -----------------------------------------------------------
+
+
+void OnRoller(){
+  vex::task runPId(startup);
+  
+  fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
+  fullDrive.stop(hold);
+  wait(0.15, sec);
+  rollRed();
+  cosdrive(10, 20);
+  turn(-10);
+  rotateSpeed = 2500;
+  vex::task RunPid(FlyWheelPIDRPM);
+  wait(2, seconds);
+  tripleshot();
+  rotateSpeed = 2000;
+}
+
+void OffRoller(){
+  vex::task runPID(startup);
+  cosdrive(45, 50);
+  turn(17);
+  rotateSpeed = 2400;
+  vex::task RUNPID(FlyWheelPIDRPM);
+  wait(2, seconds);
+  tripleshot();
+  rotateSpeed = 2000;
+  
 }

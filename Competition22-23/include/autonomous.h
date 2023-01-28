@@ -7,18 +7,20 @@ void Skills(){
   
   vex::task runPId(startup);
   
-  fullDrive.spinFor(reverse, 0.2, sec, 50, rpm);
+  fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
   fullDrive.stop(hold);
+  wait(0.15, sec);
   rollRed();
   
   rightDrive.spinFor(150, degrees, 60, rpm);
   Intake.spin(forward, 100,percent);
-  turn(-38);
+  turn(-36);
   cosdrive(26, 35);
   turn(90);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.7, sec, 40, rpm);
-  fullDrive.stop(hold);
+  fullDrive.spinFor(reverse, 0.6, sec, 40, rpm);
+  fullDrive.stop();
+  wait(0.15, sec);
   rollRed();
   
   enableFlyPID = true;
@@ -50,17 +52,20 @@ void Skills(){
   vex::task runpId(startup);
   cosdrive(-10, 20);
   Intake.stop();
-  fullDrive.spinFor(reverse, 1, sec, 25, rpm);
+  fullDrive.spinFor(reverse, 0.85, sec, 25, rpm);
+  fullDrive.stop(hold);
   rollRed();
-
+  wait(0.2, seconds);
   
   cosdrive(21, 30);
   Intake.spin(forward, 100, percent);
   turn(-180);
   cosdrive(-18, 30);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.8, sec, 25, rpm);
+  fullDrive.spinFor(reverse, 1.025, sec, 25, rpm);
+  fullDrive.stop();
   rollRed();
+  
 
   enableFlyPID = true;
   rotateSpeed = 2355;
@@ -73,7 +78,7 @@ void Skills(){
 
   
   turn(-180);
-  cosdrive(-51, 80);
+  cosdrive(-55, 80);
   turn(-135);
   cosdrive(-15, 20);
 
