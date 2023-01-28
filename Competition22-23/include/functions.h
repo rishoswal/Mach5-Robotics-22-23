@@ -253,7 +253,7 @@ void tripleshot(){
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
   wait(0.15, sec);
-  rotateSpeed = 2255;
+  rotateSpeed = 2300;
 }
 
 
@@ -278,22 +278,22 @@ void visionAim(){
       }else{
         higherObject = 1;
       }
-      Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
-      Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
+      // Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
+      // Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
     }else{
       higherObject = 0;
-      Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
+      // Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
     }
 
     // https://www.desmos.com/calculator/imonsqlj9j calculate distance
     goalDistance = 5.3 * pow(1.0125, (goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height)) + 4;
     centerX = goalCam.objects[higherObject].centerX;
 
-    Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
-    Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
-    Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
-    Brain.Screen.printAt(320, 65, "center X: %d", centerX);
-    Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
+    // Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
+    // Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
+    // Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
+    // Brain.Screen.printAt(320, 65, "center X: %d", centerX);
+    // Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
 
     wait(0.2, sec);
   }
@@ -312,33 +312,43 @@ void OnRoller(){
   Intake.spinFor(0.3, seconds);
   Intake.stop();
   rollRed();
-  cosdrive(10, 20);
+  cosdrive(8, 20);
   turn(-10);
-  rotateSpeed = 2500;
+  rotateSpeed = 2650;
   vex::task RunPid(FlyWheelPIDRPM);
-  wait(2, seconds);
-  tripleshot();
+  wait(4, seconds);
+  //tripleshot();
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  wait(3.5, seconds);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
   rotateSpeed = 2000;
 }
 
 void OffRoller(){
   vex::task runPID(startup);
-  cosdrive(45, 50);
-  turn(17);
-  rotateSpeed = 2400;
+  Intake.spin(forward, 100, percent);
+  cosdrive(33, 50);
+  //turn(20);
+  rotateSpeed = 2750;
   vex::task RUNPID(FlyWheelPIDRPM);
-  wait(2, seconds);
-  tripleshot();
-  
-  rotateSpeed = 2000;
-  turn(-15);
-  cosdrive(-30, 40);
+  //wait(4, seconds);
+  //tripleshot();
+  turn(-45);
+  cosdrive(-43, 40);
   turn(0);
+  Intake.stop();
 
-  fullDrive.spinFor(reverse, 1, sec, 50, rpm);
+  fullDrive.spinFor(reverse, 0.415, sec, 50, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
-  Intake.spinFor(0.3, seconds);
-  Intake.stop();
   rollRed();
+  cosdrive(7, 20);
+  turn(5);
+
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  wait(2, seconds);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  wait(2, seconds);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  rotateSpeed = 2000;
 }

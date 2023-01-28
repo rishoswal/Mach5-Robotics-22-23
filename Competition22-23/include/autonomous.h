@@ -18,13 +18,13 @@ void Skills(){
   cosdrive(26, 35);
   turn(90);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.6, sec, 40, rpm);
+  fullDrive.spinFor(reverse, 0.675, sec, 40, rpm);
   fullDrive.stop();
   wait(0.15, sec);
   rollRed();
   
   enableFlyPID = true;
-  rotateSpeed = 2355;
+  rotateSpeed = 2300;
   enableLogistic = false;
   
   vex::task runPID(FlyWheelPIDRPM);
@@ -46,41 +46,41 @@ void Skills(){
   turn(0);
   cosdrive(56, 65);
   wait(1, sec);
-  cosdrive(-14, 30);
+  cosdrive(-13, 30);
   turn(-90);
 
   vex::task runpId(startup);
   cosdrive(-10, 20);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.85, sec, 25, rpm);
+  fullDrive.spinFor(reverse, 0.95, sec, 25, rpm);
   fullDrive.stop(hold);
   rollRed();
   wait(0.2, seconds);
   
   cosdrive(21, 30);
-  Intake.spin(forward, 100, percent);
+  //Intake.spin(forward, 100, percent);
   turn(-180);
-  cosdrive(-18, 30);
-  Intake.stop();
-  fullDrive.spinFor(reverse, 1.025, sec, 25, rpm);
+  cosdrive(-17, 30);
+  //Intake.stop();
+  fullDrive.spinFor(reverse, 1, sec, 25, rpm);
   fullDrive.stop();
   rollRed();
   
 
   enableFlyPID = true;
-  rotateSpeed = 2355;
+  rotateSpeed = 2300;
   vex::task runpID(FlyWheelPIDRPM);
   cosdrive(71, 68);
-  rotateSpeed = 2355;
+  rotateSpeed = 2300;
   Flap.set(true);
-  turn(-195);
+  turn(-197.5);
   tripleshot();
 
   
   turn(-180);
-  cosdrive(-55, 80);
+  cosdrive(-57, 80);
   turn(-135);
-  cosdrive(-15, 20);
+  cosdrive(-12, 20);
 
   Expansion.set(true);
 

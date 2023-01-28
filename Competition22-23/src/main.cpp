@@ -63,7 +63,7 @@ void pre_auton(void) {
   vexcodeInit();
 
   Inertial.calibrate();
-  rollerColor.setLightPower(10);
+  rollerColor.setLightPower(100);
 
   left1.setBrake(coast);
   left2.setBrake(coast);
@@ -91,7 +91,9 @@ void autonomous(void) {
   //thread startOdom(odometryInertial);
   //FullWin();
   //OffRoller();
-  Skills();
+  //Skills();
+  //OnRoller();
+  OffRoller();
   // if(autonswitch.value(percent)<25){
   //   OffRoller();
   // }else if(autonswitch.value(percent)<50){
@@ -131,8 +133,8 @@ void usercontrol(void) {
   while (true) {
 
 
-    if(Controller1.ButtonL2.pressing()){
-      thread Shoot(tripleshot)  ;
+    if(Controller1.ButtonA.pressing()){
+      tripleshot();
     }
 
     if(Controller1.ButtonRight.pressing()){
@@ -147,11 +149,11 @@ void usercontrol(void) {
       waitUntil(!Controller1.ButtonLeft.pressing());
     }
 
-    if(Controller1.ButtonA.pressing()){
+    if(Controller1.ButtonRight.pressing()){
       powerLevel = 3;
     }
 
-    rotateSpeed = 2030 + (75*powerLevel);
+    rotateSpeed = 2075 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);
@@ -171,9 +173,9 @@ void usercontrol(void) {
         rightDrive.stop(coast);
     }
     
-    if (Controller1.ButtonR1.pressing()){
+    if (Controller1.ButtonR2.pressing()){
       Intake.spin(forward, 100, percent);
-    } else if (Controller1.ButtonR2.pressing()){ 
+    } else if (Controller1.ButtonR1.pressing()){ 
       Intake.spin(reverse, 50, percent);
     } else if(!autospinning){
       Intake.stop(coast);
@@ -208,10 +210,13 @@ void usercontrol(void) {
     }
 
 
-    if(Controller1.ButtonUp.pressing()){
-      Flap.set(true);
-      powerLevel = 3;
-      waitUntil(!Controller1.ButtonUp.pressing());
+    if(Controller1.ButtonL1.pressing()){
+      if(Flap.value()){
+        Flap.set(false);
+      } else{
+        Flap.set(true);
+      }
+      
     }
 
     if(Controller1.ButtonDown.pressing()){
