@@ -309,6 +309,8 @@ void OnRoller(){
   fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
+  Intake.spinFor(0.3, seconds);
+  Intake.stop();
   rollRed();
   cosdrive(10, 20);
   turn(-10);
@@ -327,6 +329,16 @@ void OffRoller(){
   vex::task RUNPID(FlyWheelPIDRPM);
   wait(2, seconds);
   tripleshot();
-  rotateSpeed = 2000;
   
+  rotateSpeed = 2000;
+  turn(-15);
+  cosdrive(-30, 40);
+  turn(0);
+
+  fullDrive.spinFor(reverse, 1, sec, 50, rpm);
+  fullDrive.stop(hold);
+  wait(0.15, sec);
+  Intake.spinFor(0.3, seconds);
+  Intake.stop();
+  rollRed();
 }

@@ -131,22 +131,23 @@ void usercontrol(void) {
   while (true) {
 
 
-    if(Controller1.ButtonA.pressing()){
+    if(Controller1.ButtonL2.pressing()){
       thread Shoot(tripleshot)  ;
     }
 
-    if(Controller1.ButtonUp.pressing()){
+    if(Controller1.ButtonRight.pressing()){
       //volts = 9.5;
       powerLevel++;
-      waitUntil(!Controller1.ButtonUp.pressing());
+      waitUntil(!Controller1.ButtonRight.pressing());
     }
   
-    if(Controller1.ButtonDown.pressing()){
+    if(Controller1.ButtonLeft.pressing()){
       powerLevel--;
-      waitUntil(!Controller1.ButtonDown.pressing());
+      Flywheel.spin(forward, 2030 + (75*powerLevel), rpm);
+      waitUntil(!Controller1.ButtonLeft.pressing());
     }
 
-    if(Controller1.ButtonRight.pressing()){
+    if(Controller1.ButtonA.pressing()){
       powerLevel = 3;
     }
 
@@ -170,18 +171,19 @@ void usercontrol(void) {
         rightDrive.stop(coast);
     }
     
-    if (Controller1.ButtonR2.pressing()){
+    if (Controller1.ButtonR1.pressing()){
       Intake.spin(forward, 100, percent);
-    } else if (Controller1.ButtonR1.pressing()){ 
+    } else if (Controller1.ButtonR2.pressing()){ 
       Intake.spin(reverse, 50, percent);
     } else if(!autospinning){
       Intake.stop(coast);
     }
 
-    if(Controller1.ButtonL2.pressing()){
+    /*if(Controller1.ButtonL2.pressing()){
       thread roll(rollToColor);
       waitUntil(!Controller1.ButtonL2.pressing());
     }
+    */
 
     //Controller1.ButtonR1.pressed(shoot);
     // if(Controller1.ButtonB.pressing()){
@@ -206,14 +208,18 @@ void usercontrol(void) {
     }
 
 
-    if(Controller1.ButtonL1.pressing()){
-      if(Flap.value()){
-        Flap.set(false);
-      }else{
-        Flap.set(true);
-      }
-      waitUntil(!Controller1.ButtonL1.pressing());
+    if(Controller1.ButtonUp.pressing()){
+      Flap.set(true);
+      powerLevel = 3;
+      waitUntil(!Controller1.ButtonUp.pressing());
     }
+
+    if(Controller1.ButtonDown.pressing()){
+      Flap.set(false);
+      powerLevel = 6.3;
+      waitUntil(!Controller1.ButtonDown.pressing());
+    }
+
     Controller1.Screen.setCursor(1, 1);
     Brain.Screen.clearScreen();
      Brain.Screen.printAt(15, 20, "Hue: %f", rollerColor.hue());
