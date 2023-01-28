@@ -16,7 +16,7 @@
 // left2                motor         20              
 // left3                motor         18              
 // right1               motor         16              
-// right2               motor         17              
+// right2               motor         17              a
 // right3               motor         12              
 // Intake               motor         10              
 // Inertial             inertial      3               
@@ -133,7 +133,7 @@ void usercontrol(void) {
   while (true) {
 
 
-    if(Controller1.ButtonA.pressing()){
+    if(Controller1.ButtonL2.pressing()){
       tripleshot();
     }
 
@@ -149,7 +149,7 @@ void usercontrol(void) {
       waitUntil(!Controller1.ButtonLeft.pressing());
     }
 
-    if(Controller1.ButtonRight.pressing()){
+    if(Controller1.ButtonA.pressing()){
       powerLevel = 3;
     }
 
@@ -210,13 +210,10 @@ void usercontrol(void) {
     }
 
 
-    if(Controller1.ButtonL1.pressing()){
-      if(Flap.value()){
-        Flap.set(false);
-      } else{
-        Flap.set(true);
-      }
-      
+    if(Controller1.ButtonUp.pressing()){
+      powerLevel = 3;
+      Flap.set(true);
+      waitUntil(!Controller1.ButtonDown.pressing());
     }
 
     if(Controller1.ButtonDown.pressing()){
