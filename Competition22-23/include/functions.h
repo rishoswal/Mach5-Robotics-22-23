@@ -28,18 +28,28 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 
 int endAngle=0; //driving forward will drift the back encoder unintentionally,
 //so we save the value of where we turned last and use it when turning again to ignore drift.
-void turn(float angle){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
+void turn(float angle, bool fast = false){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction
   float trueRotation = Inertial.rotation() * 1.0227;
   float error = angle-(trueRotation);
   while(fabs(error)>2){ //exits loop if error <2 and rotational speed <1
     trueRotation = Inertial.rotation() * 1.0227;
     error = angle-(trueRotation);//calculates error value
-    if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
-      leftDrive.spin(forward,36*(fabs(error)/error),percent);
-      rightDrive.spin(reverse,36*(fabs(error)/error),percent);
+    if(!fast){
+      if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
+        leftDrive.spin(forward,36*(fabs(error)/error),percent);
+        rightDrive.spin(reverse,36*(fabs(error)/error),percent);
+      }else{
+        leftDrive.spin(forward,error*0.73,percent);
+        rightDrive.spin(reverse,error*0.73,percent);
+      }
     }else{
-      leftDrive.spin(forward,error*0.73,percent);
-      rightDrive.spin(reverse,error*0.73,percent);
+      if(fabs(error)>54){ //if error is greater than 50, use proportional correction. if not, turn at 36 percent speed
+        leftDrive.spin(forward,50*(fabs(error)/error),percent);
+        rightDrive.spin(reverse,50*(fabs(error)/error),percent);
+      }else{
+        leftDrive.spin(forward,error*0.79,percent);
+        rightDrive.spin(reverse,error*0.79,percent);
+      }
     }
   }
   leftDrive.stop();
@@ -233,14 +243,15 @@ void rollToColor(){
   if(rollerColor.isNearObject()){
     autospinning = true;
     if(colorSwitch.value(percent) < 50){
-      while(rollerColor.hue() < 100){
-        Intake.spin(forward, 60, percent);
+      while(rollerColor.hue() > 300 || rollerColor.hue() < 100){
+        Intake.spin(forward, 90, percent);
       }
     }else{
-      while(rollerColor.hue() > 100){
-        Intake.spin(forward, 60, percent);
+      while(rollerColor.hue() < 300 && rollerColor.hue() > 100){
+        Intake.spin(forward, 90, percent);
       }
     }
+    Intake.stop();
     autospinning = false;
   }
 }
@@ -297,58 +308,4 @@ void visionAim(){
 
     wait(0.2, sec);
   }
-}
-
-
-//------------------- 15 Seconds -----------------------------------------------------------
-
-
-void OnRoller(){
-  vex::task runPId(startup);
-  
-  fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
-  fullDrive.stop(hold);
-  wait(0.15, sec);
-  Intake.spinFor(0.3, seconds);
-  Intake.stop();
-  rollRed();
-  cosdrive(8, 20);
-  turn(-10);
-  rotateSpeed = 2650;
-  vex::task RunPid(FlyWheelPIDRPM);
-  wait(4, seconds);
-  //tripleshot();
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(3.5, seconds);
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  rotateSpeed = 2000;
-}
-
-void OffRoller(){
-  vex::task runPID(startup);
-  Intake.spin(forward, 100, percent);
-  cosdrive(33, 50);
-  //turn(20);
-  rotateSpeed = 2750;
-  vex::task RUNPID(FlyWheelPIDRPM);
-  //wait(4, seconds);
-  //tripleshot();
-  turn(-45);
-  cosdrive(-43, 40);
-  turn(0);
-  Intake.stop();
-
-  fullDrive.spinFor(reverse, 0.415, sec, 50, rpm);
-  fullDrive.stop(hold);
-  wait(0.15, sec);
-  rollRed();
-  cosdrive(7, 20);
-  turn(5);
-
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(2, seconds);
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(2, seconds);
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  rotateSpeed = 2000;
 }
