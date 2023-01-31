@@ -89,11 +89,11 @@ void pre_auton(void) {
 
 void autonomous(void) {
   //thread startOdom(odometryInertial);
-  // Win();
+  //Win();
   //OffRoller();
   Skills();
   //OnRoller();
-  //OffRoller();
+  // OffRoller();
   // if(autonswitch.value(percent)<25){
   //   OffRoller();
   // }else if(autonswitch.value(percent)<50){
@@ -133,7 +133,7 @@ void usercontrol(void) {
   while (true) {
 
 
-    if(Controller1.ButtonL2.pressing()){
+    if(Controller1.ButtonA.pressing()){
       tripleshot();
     }
 
@@ -149,11 +149,11 @@ void usercontrol(void) {
       waitUntil(!Controller1.ButtonLeft.pressing());
     }
 
-    if(Controller1.ButtonA.pressing()){
+    if(Controller1.ButtonB.pressing()){
       powerLevel = 3;
     }
 
-    rotateSpeed = 2075 + (75*powerLevel);
+    rotateSpeed = 2160 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);
@@ -200,17 +200,30 @@ void usercontrol(void) {
     //   }
     //   waitUntil(!Controller1.ButtonX.pressing());
     // }
-    if(Controller1.ButtonY.pressing()){
+    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
+      Expansion.set(true);
+    }
+
+    /*if(Controller1.ButtonY.pressing()){
       Expansion.set(true);
     }
 
     if(Controller1.ButtonX.pressing()){
       const int targetX = 162;
       turn(Inertial.yaw() - (0.25 * (targetX-centerX)));
+    }*/
+
+    if(Controller1.ButtonL1.pressing()){
+      if(Flap.value()){
+        Flap.set(false);
+        waitUntil(!Controller1.ButtonL1.pressing());
+      } else {
+        Flap.set(true);
+        waitUntil(!Controller1.ButtonL1.pressing());
+      }
     }
 
-
-    if(Controller1.ButtonUp.pressing()){
+   /* if(Controller1.ButtonUp.pressing()){
       powerLevel = 3;
       Flap.set(true);
       waitUntil(!Controller1.ButtonDown.pressing());
@@ -220,7 +233,7 @@ void usercontrol(void) {
       Flap.set(false);
       powerLevel = 6.3;
       waitUntil(!Controller1.ButtonDown.pressing());
-    }
+    }*/
 
     Controller1.Screen.setCursor(1, 1);
     Brain.Screen.clearScreen();

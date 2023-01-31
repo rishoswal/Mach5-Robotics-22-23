@@ -5,12 +5,12 @@ using namespace vex;
 void Skills(){
   thread display(printHeading);
   
-  vex::task runPId(startup);
+  //vex::task runPId(startup);
   
   fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
-  rollToColor();
+  rollRed();
   
   rightDrive.spinFor(150, degrees, 60, rpm);
   Intake.spin(forward, 100,percent);
@@ -18,13 +18,13 @@ void Skills(){
   cosdrive(26, 35);
   turn(90);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.675, sec, 40, rpm);
-  fullDrive.stop();
+  fullDrive.spinFor(reverse, 1.6, sec, 20, rpm);
+  fullDrive.stop(hold);
   wait(0.15, sec);
-  rollToColor();
+  rollRed();
   
   enableFlyPID = true;
-  rotateSpeed = 2300;
+  rotateSpeed = 2400;
   enableLogistic = false;
   
   vex::task runPID(FlyWheelPIDRPM);
@@ -54,7 +54,7 @@ void Skills(){
   Intake.stop();
   fullDrive.spinFor(reverse, 0.95, sec, 25, rpm);
   fullDrive.stop(hold);
-  rollToColor();
+  rollRed();
   wait(0.2, seconds);
   
   cosdrive(21, 30);
@@ -64,14 +64,14 @@ void Skills(){
   //Intake.stop();
   fullDrive.spinFor(reverse, 1, sec, 25, rpm);
   fullDrive.stop();
-  rollToColor();
+  rollRed();
   
 
   enableFlyPID = true;
-  rotateSpeed = 2300;
+  rotateSpeed = 2400;
   vex::task runpID(FlyWheelPIDRPM);
   cosdrive(71, 68);
-  rotateSpeed = 2300;
+  rotateSpeed = 2400;
   Flap.set(true);
   turn(-197.5);
   tripleshot();
@@ -101,13 +101,14 @@ void OnRoller(){
   rollToColor();
   cosdrive(8, 20);
   turn(-10);
-  rotateSpeed = 2650;
+  rotateSpeed = 2755;
   vex::task RunPid(FlyWheelPIDRPM);
   wait(4, seconds);
   //tripleshot();
   Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(3.5, seconds);
+  wait(2, seconds);
   Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  Flywheel.spin(forward, 2000, rpm);
   rotateSpeed = 2000;
 }
 
@@ -150,14 +151,14 @@ void Win(){
   fullDrive.stop(hold);
   rollToColor();
   fullDrive.spinFor(forward, 0.20, sec, 80, rpm);
-  turn(44, true);
-  cosdrive(146, 100);
+  turn(43, true);
+  cosdrive(142, 100);
 
   rotateSpeed = 2730;
   task RUNPID(FlyWheelPIDRPM);
 
-  rightDrive.spinFor(forward, 0.2, sec, 90, rpm);
-  fullDrive.spinFor(reverse, 0.20, sec, 50, rpm);
+  rightDrive.spinFor(forward, 0.36, sec, 100, rpm);
+  //fullDrive.spinFor(forward, 0.20, sec, 50, rpm);
   turn(-90, true);
   cosdrive(-13, 40);
   fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);

@@ -70,7 +70,7 @@ void printHeading(){
 int counter = 0;
 int finalSpeed = 1800;
 int rotateSpeed = 2375;
-int powerLevel = 3;
+float powerLevel = 3;
 int error;
 int prevError;
 int derivative;
@@ -210,6 +210,8 @@ void autoPower(){
 
 
 bool autospinning = false;
+timer rollTimer;
+
 void rollNextColor(){
   if(rollerColor.isNearObject()){
     autospinning = true;
@@ -242,13 +244,20 @@ void rollRed(){
 void rollToColor(){
   if(rollerColor.isNearObject()){
     autospinning = true;
+    rollTimer.reset();
     if(colorSwitch.value(percent) < 50){
       while(rollerColor.hue() > 300 || rollerColor.hue() < 100){
         Intake.spin(forward, 90, percent);
+        if(rollTimer.time(sec) > 3){
+          break;
+        }
       }
     }else{
       while(rollerColor.hue() < 300 && rollerColor.hue() > 100){
         Intake.spin(forward, 90, percent);
+        if(rollTimer.time(sec) > 3){
+          break;
+        }
       }
     }
     Intake.stop();
@@ -258,13 +267,13 @@ void rollToColor(){
 
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 70, rpm);
-  rotateSpeed = 3450;
-  wait(0.125, sec);
-  Intake.spinFor(reverse, 1.2, sec, 70, rpm);
+  rotateSpeed = 3500;
+  wait(0.12, sec);
+  Intake.spinFor(reverse, 1.5, sec, 70, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
   wait(0.15, sec);
-  rotateSpeed = 2300;
+  rotateSpeed = 2385;
 }
 
 
