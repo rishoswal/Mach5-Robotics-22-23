@@ -6,7 +6,6 @@ void Skills(){
   thread display(printHeading);
   
   //vex::task runPId(startup);
-  
   fullDrive.spinFor(reverse, 0.25, sec, 50, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
@@ -14,11 +13,11 @@ void Skills(){
   
   rightDrive.spinFor(150, degrees, 60, rpm);
   Intake.spin(forward, 100,percent);
-  turn(-36);
-  cosdrive(26, 35);
+  turn(-31);
+  cosdrive(24, 35);
   turn(90);
   Intake.stop();
-  fullDrive.spinFor(reverse, 1.6, sec, 20, rpm);
+  fullDrive.spinFor(reverse, 1.7, sec, 20, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
   rollRed();

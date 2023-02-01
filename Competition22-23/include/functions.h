@@ -229,10 +229,17 @@ void rollNextColor(){
 }
 
 void rollRed(){
+  rollTimer.reset();
+  //rollTimer.start();
   if(rollerColor.isNearObject()){
     autospinning = true;
     if(rollerColor.hue() > 300 or rollerColor.hue() < 200){
       while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
+        if(rollTimer.value() > 3){
+          Brain.Screen.print("3 sec");
+          break;
+
+        }
         Intake.spin(forward, 100, percent);
       }
       Intake.stop();
