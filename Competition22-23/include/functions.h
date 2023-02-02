@@ -109,7 +109,7 @@ int startup(){
 
 int FlyWheelPIDRPM() {
   waitUntil(enableFlyPID);
-  while (true) {
+  while (enableFlyPID) {
     if(toggleAutoSpeed == false){
       diff = 0;
       error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
@@ -235,7 +235,7 @@ void rollRed(){
     autospinning = true;
     if(rollerColor.hue() > 300 or rollerColor.hue() < 200){
       while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
-        if(rollTimer.value() > 3){
+        if(rollTimer.value() > 2.5){
           Brain.Screen.print("3 sec");
           break;
 
@@ -279,8 +279,8 @@ void tripleshot(){
   Intake.spinFor(reverse, 1.5, sec, 70, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
-  wait(0.15, sec);
-  rotateSpeed = 2385;
+  wait(0.2, sec);
+  rotateSpeed = 2355;
 }
 
 
