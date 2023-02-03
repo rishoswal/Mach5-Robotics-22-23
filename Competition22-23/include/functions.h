@@ -8,7 +8,7 @@ motor_group fullDrive(left1, left2, left3, right1, right2, right3);
 
 
 //---------------- AUTONOMOUS DRIVING ------------------------------------------------------------------------------
-
+ 
 
 timer drivetimer;
 void cosdrive(double inches, double speed){ //uses the changing slope of a cosine wave to accelerate/decelerate the robot for precise movement.
@@ -280,7 +280,7 @@ void tripleshot(){
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2355;
+  rotateSpeed = 2225;
 }
 
 

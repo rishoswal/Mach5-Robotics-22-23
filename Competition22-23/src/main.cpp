@@ -153,7 +153,7 @@ void usercontrol(void) {
       powerLevel = 3;
     }
 
-    rotateSpeed = 2130 + (75*powerLevel);
+    rotateSpeed = 2000 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);
