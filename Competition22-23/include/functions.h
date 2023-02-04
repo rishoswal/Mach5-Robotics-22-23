@@ -27,6 +27,20 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 	rightDrive.stop();
 }
 
+// https://www.desmos.com/calculator/yyccuiiib1
+void cosdrive(double d){ // d distance (inches)
+  const double c = 2.56; // rotations-to-inches coefficient (no unit)
+  const double a = 45; // acceleration (in/sec/sec)
+  const double tf = sqrt(c * 3.1416 * fabs(d) / a); // time final (sec)
+  const double vm = sqrt(c * fabs(d) * a / 6.2832); // velocity maximum (in/sec)
+  drivetimer.reset();
+  while(drivetimer.time(sec) < tf){
+    fullDrive.spin(forward, vm * (1 - cos(6.2832 * drivetimer.time(sec) / tf)) * fabs(d)/d, percent);
+    wait(10,msec);
+  }
+  fullDrive.stop();
+}
+
 int endAngle=0; //driving forward will drift the back encoder unintentionally,
 //so we save the value of where we turned last and use it when turning again to ignore drift.
 void turn(float angle, bool fast = false){ //function for turning. Spins with a speed cap of 36 percent, uses proportional correction

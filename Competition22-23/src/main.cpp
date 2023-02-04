@@ -90,7 +90,7 @@ void pre_auton(void) {
 void autonomous(void) {
   //thread startOdom(odometryInertial);
   //Win();
-  OffRoller();
+  // OffRoller();
   //Skills();
   //OnRoller();
   // OffRoller();
@@ -103,6 +103,10 @@ void autonomous(void) {
   // }else{
   //   Skills();
   // }
+  cosdrive(24);
+  cosdrive(24);
+  cosdrive(-53);
+  cosdrive(5);
 }
 
 /*---------------------------------------------------------------------------*/
