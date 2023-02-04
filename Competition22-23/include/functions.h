@@ -21,6 +21,7 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
     velocity=(1-cos((6.283*drivetimer.time(sec))/seconds))*speed/2 * (fabs(inches)/inches); //uses equation for the cosine wave to calculate velocity.
     leftDrive.spin(forward,velocity,percent);
 		rightDrive.spin(forward,velocity,percent);
+    wait(10,msec);
 	}                                                                                                                                                              
 	leftDrive.stop();
 	rightDrive.stop();
@@ -273,14 +274,14 @@ void rollToColor(){
 }
 
 void tripleshot(){
-  Intake.spinFor(reverse, 0.5, sec, 70, rpm);
+  Intake.spinFor(reverse, 0.5, sec, 140, rpm);
   rotateSpeed = 3500;
   wait(0.12, sec);
-  Intake.spinFor(reverse, 1.5, sec, 70, rpm);
+  Intake.spinFor(reverse, 1.5, sec, 140, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2225;
+  rotateSpeed = 2375;
 }
 
 
@@ -305,22 +306,22 @@ void visionAim(){
       }else{
         higherObject = 1;
       }
-      // Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
-      // Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
+      Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
+      Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
     }else{
       higherObject = 0;
-      // Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
+      Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
     }
 
     // https://www.desmos.com/calculator/imonsqlj9j calculate distance
     goalDistance = 5.3 * pow(1.0125, (goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height)) + 4;
     centerX = goalCam.objects[higherObject].centerX;
 
-    // Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
-    // Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
-    // Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
-    // Brain.Screen.printAt(320, 65, "center X: %d", centerX);
-    // Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
+    Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
+    Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
+    Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
+    Brain.Screen.printAt(320, 65, "center X: %d", centerX);
+    Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
 
     wait(0.2, sec);
   }

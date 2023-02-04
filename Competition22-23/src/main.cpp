@@ -90,8 +90,8 @@ void pre_auton(void) {
 void autonomous(void) {
   //thread startOdom(odometryInertial);
   //Win();
-  //OffRoller();
-  Skills();
+  OffRoller();
+  //Skills();
   //OnRoller();
   // OffRoller();
   // if(autonswitch.value(percent)<25){
@@ -153,7 +153,7 @@ void usercontrol(void) {
       powerLevel = 3;
     }
 
-    rotateSpeed = 2000 + (75*powerLevel);
+    rotateSpeed = 2075 + (75*powerLevel);
     Controller1.Screen.print(powerLevel);
 
     // thread startFlywheel(autoPower);
@@ -236,8 +236,8 @@ void usercontrol(void) {
     }*/
 
     Controller1.Screen.setCursor(1, 1);
-    Brain.Screen.clearScreen();
-     Brain.Screen.printAt(15, 20, "Hue: %f", rollerColor.hue());
+    // Brain.Screen.clearScreen();
+    //  Brain.Screen.printAt(15, 20, "Hue: %f", rollerColor.hue());
     // Brain.Screen.printAt(15, 40, "    Voltage: %f", Flywheel.velocity(rpm)*6);
     // Brain.Screen.printAt(15, 55, "      Power: %f", Flywheel.voltage());
     // Brain.Screen.printAt(15, 70, "     Torque: %f", Flywheel.torque());

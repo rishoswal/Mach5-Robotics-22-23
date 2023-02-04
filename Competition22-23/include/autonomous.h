@@ -25,7 +25,7 @@ void Skills(){
   rollRed();
   
   enableFlyPID = true;
-  rotateSpeed = 2225;
+  rotateSpeed = 2375;
   enableLogistic = false;
   
   vex::task runPID(FlyWheelPIDRPM);
@@ -38,7 +38,7 @@ void Skills(){
   turn(-10);
   Intake.stop();
   tripleshot();
-  //wait(1, sec);
+  //wait(0.2, sec);
 
   enableFlyPID = false;
   Flywheel.stop();
@@ -47,44 +47,45 @@ void Skills(){
   turn(85.5);
   Intake.spin(forward, 100, percent);
   cosdrive(103, 57);
-  turn(0);
+  turn(2);
   wait(0.1, sec);
-  turn(0);
+  turn(2);
   cosdrive(56, 65);
-  wait(1, sec);
-  cosdrive(-13, 30);
+  wait(0.3, sec);
+  cosdrive(-15, 30);
   turn(-90);
 
   vex::task runpId(startup);
-  cosdrive(-10, 20);
+  cosdrive(-17, 50);
   Intake.stop();
-  fullDrive.spinFor(reverse, 1.2, sec, 25, rpm);
+  fullDrive.spinFor(reverse, 0.5, sec, 25, rpm);
   fullDrive.stop(hold);
   rollRed();
+
   wait(0.2, seconds);
   
-  cosdrive(23, 30);
+  cosdrive(23, 50);
   turn(-180);
-  cosdrive(-17, 30);
-  fullDrive.spinFor(reverse, 0.9, sec, 25, rpm);
+  cosdrive(-21, 50);
+  fullDrive.spinFor(reverse, 0.3, sec, 25, rpm);
   fullDrive.stop(hold);
   rollRed();
   
 
   enableFlyPID = true;
-  rotateSpeed = 2225;
+  rotateSpeed = 2375;
   vex::task runpID(FlyWheelPIDRPM);
-  cosdrive(71, 68);
-  rotateSpeed = 2225;
+  cosdrive(71, 87);
+  rotateSpeed = 2375;
   Flap.set(true);
   turn(-197.5);
   tripleshot();
 
   
   turn(-180);
-  cosdrive(-57, 80);
+  cosdrive(-57, 100);
   turn(-135);
-  cosdrive(-12, 20);
+  cosdrive(-12, 50);
 
   Expansion.set(true);
 
@@ -134,14 +135,14 @@ void OffRoller(){
   fullDrive.stop(hold);
   wait(0.15, sec);
   rollToColor();
-  cosdrive(7, 20);
+  cosdrive(4, 20);
   turn(8);
 
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(2, seconds);
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
-  wait(2, seconds);
-  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
+  wait(1.8, seconds);
+  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
+  wait(1.8, seconds);
+  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
   Flywheel.spin(forward, 2000, rpm);
   rotateSpeed = 2000;
   
