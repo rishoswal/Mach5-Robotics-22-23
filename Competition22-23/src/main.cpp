@@ -16,7 +16,7 @@
 // left2                motor         20              
 // left3                motor         18              
 // right1               motor         16              
-// right2               motor         17              a
+// right2               motor         17              
 // right3               motor         12              
 // Intake               motor         10              
 // Inertial             inertial      3               
@@ -90,8 +90,8 @@ void pre_auton(void) {
 void autonomous(void) {
   //thread startOdom(odometryInertial);
   //Win();
-  // OffRoller();
-  //Skills();
+  //OffRoller();
+  Skills();
   //OnRoller();
   // OffRoller();
   // if(autonswitch.value(percent)<25){
@@ -103,10 +103,6 @@ void autonomous(void) {
   // }else{
   //   Skills();
   // }
-  cosdrive(24);
-  cosdrive(24);
-  cosdrive(-53);
-  cosdrive(5);
 }
 
 /*---------------------------------------------------------------------------*/

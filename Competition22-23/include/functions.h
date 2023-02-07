@@ -320,6 +320,7 @@ void visionAim(){
       }else{
         higherObject = 1;
       }
+      higherObject = goalCam.objects[0].centerY > goalCam.objects[1].centerY;
       Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
       Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
     }else{

@@ -43,31 +43,32 @@ void Skills(){
   enableFlyPID = false;
   Flywheel.stop();
   
-  cosdrive(-4.5, 10);
+  cosdrive(-5.5, 10);
   turn(85.5);
   Intake.spin(forward, 100, percent);
   cosdrive(103, 57);
-  turn(2);
+  turn(0);
   wait(0.1, sec);
-  turn(2);
-  cosdrive(56, 65);
+  turn(0);
+  cosdrive(57, 65);
   wait(0.3, sec);
-  cosdrive(-15, 30);
+  cosdrive(-16, 30);
   turn(-90);
 
+  enableLogistic = true;
   vex::task runpId(startup);
   cosdrive(-17, 50);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.5, sec, 25, rpm);
+  fullDrive.spinFor(reverse, 0.2, sec, 25, rpm);
   fullDrive.stop(hold);
   rollRed();
 
   wait(0.2, seconds);
   
-  cosdrive(23, 50);
+  cosdrive(25, 50);
   turn(-180);
-  cosdrive(-21, 50);
-  fullDrive.spinFor(reverse, 0.3, sec, 25, rpm);
+  cosdrive(-22, 50);
+  fullDrive.spinFor(reverse, 0.4, sec, 25, rpm);
   fullDrive.stop(hold);
   rollRed();
   
@@ -81,12 +82,13 @@ void Skills(){
   turn(-197.5);
   tripleshot();
 
-  
+  enableFlyPID = false;
+  Flywheel.stop();  
   turn(-180);
   cosdrive(-57, 100);
   turn(-135);
   cosdrive(-12, 50);
-
+  
   Expansion.set(true);
 
 
