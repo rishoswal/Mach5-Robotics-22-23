@@ -293,7 +293,7 @@ void tripleshot(){
   wait(0.19, sec);
   Intake.spinFor(reverse, 1.7, sec, 135, rpm);
   //wait(0.2, sec);
-  Flywheel.spin(forward, 2000, rpm);
+  //Flywheel.spin(forward, 2000, rpm);
   wait(0.2, sec);
   rotateSpeed = 2375;
 }

@@ -90,10 +90,10 @@ void pre_auton(void) {
 void autonomous(void) {
   //thread startOdom(odometryInertial);
   //Win();
-  OffRoller();
+  //OffRoller();
   //Skills();
-  //OnRoller();
-  // OffRoller();
+  // OnRoller();
+  OffRoller();
   // if(autonswitch.value(percent)<25){
   //   OffRoller();
   // }else if(autonswitch.value(percent)<50){
