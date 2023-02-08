@@ -289,9 +289,9 @@ void rollToColor(){
 
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 140, rpm);
-  rotateSpeed = 3500;
-  wait(0.12, sec);
-  Intake.spinFor(reverse, 1.5, sec, 140, rpm);
+  rotateSpeed = 3800;
+  wait(0.19, sec);
+  Intake.spinFor(reverse, 1.7, sec, 135, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 2000, rpm);
   wait(0.2, sec);

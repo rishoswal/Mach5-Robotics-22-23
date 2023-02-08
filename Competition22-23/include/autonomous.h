@@ -124,7 +124,7 @@ void OffRoller(){
   Intake.spin(forward, 100, percent);
   cosdrive(33, 70);
   //turn(20);
-  rotateSpeed = 2755;
+  rotateSpeed = 2800;
   vex::task RUNPID(FlyWheelPIDRPM);
   //wait(4, seconds);
   //tripleshot();
@@ -138,13 +138,13 @@ void OffRoller(){
   wait(0.15, sec);
   rollToColor();
   cosdrive(4, 20);
-  turn(8);
+  turn(6);
 
-  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
-  wait(1.8, seconds);
-  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
-  wait(1.8, seconds);
-  Intake.spinFor(reverse, 0.5, seconds, 50, rpm);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  wait(1.5, seconds);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
+  wait(1.5, seconds);
+  Intake.spinFor(reverse, 0.9, seconds, 50, rpm);
   Flywheel.spin(forward, 2000, rpm);
   rotateSpeed = 2000;
   
