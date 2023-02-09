@@ -85,7 +85,7 @@ void printHeading(){
 int counter = 0;
 int finalSpeed = 1800;
 int rotateSpeed = 2375;
-float powerLevel = 3;
+float powerLevel = 8;
 int error;
 int prevError;
 int derivative;
@@ -134,7 +134,7 @@ int FlyWheelPIDRPM() {
       diff = (error * kP) + (derivative * kD);
       prevError = error;
       currSpeed = Flywheel.velocity(rpm) - diff;
-      if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100){
+      if (Flywheel.velocity(rpm)*6 < rotateSpeed - 100 || Flywheel.velocity(rpm)*6 > rotateSpeed + 20){
         Flywheel.spin(forward, currSpeed, rpm);
       }
       
@@ -291,9 +291,9 @@ void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 140, rpm);
   rotateSpeed = 3800;
   wait(0.19, sec);
-  Intake.spinFor(reverse, 1.7, sec, 135, rpm);
+  Intake.spinFor(reverse, 1.5, sec, 135, rpm);
   //wait(0.2, sec);
-  //Flywheel.spin(forward, 2000, rpm);
+  Flywheel.spin(forward, 1000, rpm);
   wait(0.2, sec);
   rotateSpeed = 2375;
 }

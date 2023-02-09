@@ -93,7 +93,7 @@ void autonomous(void) {
   //OffRoller();
   //Skills();
   // OnRoller();
-  OffRoller();
+  oldOffRoller();
   // if(autonswitch.value(percent)<25){
   //   OffRoller();
   // }else if(autonswitch.value(percent)<50){
@@ -150,7 +150,7 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonB.pressing()){
-      powerLevel = 3;
+      powerLevel = 8;
     }
 
     rotateSpeed = 2075 + (75*powerLevel);
@@ -216,9 +216,13 @@ void usercontrol(void) {
     if(Controller1.ButtonL1.pressing()){
       if(Flap.value()){
         Flap.set(false);
+        powerLevel = 8;
         waitUntil(!Controller1.ButtonL1.pressing());
       } else {
         Flap.set(true);
+        powerLevel = 3;
+        //Flywheel.spin(forward, 800, rpm);
+        //wait(0.2, sec);
         waitUntil(!Controller1.ButtonL1.pressing());
       }
     }
