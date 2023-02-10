@@ -145,29 +145,28 @@ void OnRoller(){
 void oldOffRoller(){
   vex::task runPID(startup);
   Intake.spin(forward, 100, percent);
-  cosdrive(33, 70);
-  //turn(20);
-  rotateSpeed = 2775;
-  vex::task RUNPID(FlyWheelPIDRPM);
-  //wait(4, seconds);
-  //tripleshot();
-  turn(-45);
-  cosdrive(-43, 60);
-  turn(0);
+  cosdrive(21);
+  turn(-45, true);
+  cosdrive(-32);
+  rightDrive.spinFor(reverse, 0.6, seconds, 100, rpm);
+  //turn(0);
   Intake.stop();
 
-  fullDrive.spinFor(reverse, 0.355, sec, 50, rpm);
-  fullDrive.stop(hold);
-  wait(0.15, sec);
+  fullDrive.spinFor(reverse, 0.2, sec, 40, rpm);
+  // fullDrive.stop(hold);
+  //wait(0.15, sec);
   rollToColor();
-  cosdrive(4, 20);
-  turn(6);
-  wait(0.5, sec);
-
+  rightDrive.spinFor(forward, 0.2, seconds, 140, rpm);
+  vex::task RunPid(FlyWheelPIDRPM);
+  rotateSpeed = 2595;
+  turn(-45, true);
+  cosdrive(70);
+  turn(44);
+  wait(0.2, sec);
   Intake.spinFor(reverse, 0.7, sec, 100, rpm);
-  wait(0.3, sec);
-  Intake.spinFor(reverse, 0.7, sec, 100, rpm);
-  wait(0.3, sec);
+  wait(0.2, sec);
+  Intake.spinFor(reverse, 0.5, sec, 100, rpm);
+  wait(0.2, sec);
   Intake.spinFor(reverse, 0.7, sec, 100, rpm);
   rotateSpeed = 2000;
   
@@ -176,12 +175,12 @@ void oldOffRoller(){
 void OffRoller(){
   vex::task runPID(startup);
   Intake.spin(forward, 100, percent);
-  cosdrive(34);
+  cosdrive(28);
 
   vex::task RunPid(FlyWheelPIDRPM);
-  rotateSpeed = 2600;
+  rotateSpeed = 2550;
   turn(31);
-  wait(4, sec);
+  wait(5, sec);
   Intake.spinFor(reverse, 0.7, sec, 100, rpm);
   wait(0.5, sec);
   Intake.spinFor(reverse, 0.7, sec, 100, rpm);
@@ -192,7 +191,7 @@ void OffRoller(){
   //wait(4, seconds);
   //tripleshot();
   turn(-45, true);
-  cosdrive(-45);
+  cosdrive(-40);
   turn(0, true);
   Intake.stop();
 

@@ -30,7 +30,7 @@ void cosdrive(double inches, double speed){ //uses the changing slope of a cosin
 // https://www.desmos.com/calculator/yyccuiiib1
 void cosdrive(double d){ // d distance (inches)
   const double c = 2.56; // rotations-to-inches coefficient (no unit)
-  const double a = 45; // acceleration (in/sec/sec)
+  const double a = 50; // acceleration (in/sec/sec)
   const double tf = sqrt(c * 3.1416 * fabs(d) / a); // time final (sec)
   const double vm = sqrt(c * fabs(d) * a / 6.2832); // velocity maximum (in/sec)
   drivetimer.reset();
@@ -85,7 +85,7 @@ void printHeading(){
 int counter = 0;
 int finalSpeed = 1800;
 int rotateSpeed = 2375;
-float powerLevel = 8;
+float powerLevel = 3;
 int error;
 int prevError;
 int derivative;
@@ -270,14 +270,14 @@ void rollToColor(){
     if(colorSwitch.value(percent) < 50){
       while(rollerColor.hue() > 300 || rollerColor.hue() < 100){
         Intake.spin(forward, 90, percent);
-        if(rollTimer.time(sec) > 3){
+        if(rollTimer.time(sec) > 2){
           break;
         }
       }
     }else{
       while(rollerColor.hue() < 300 && rollerColor.hue() > 100){
         Intake.spin(forward, 90, percent);
-        if(rollTimer.time(sec) > 3){
+        if(rollTimer.time(sec) > 2){
           break;
         }
       }

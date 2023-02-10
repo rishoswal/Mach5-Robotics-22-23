@@ -91,7 +91,7 @@ void autonomous(void) {
   //thread startOdom(odometryInertial);
   //Win();
   //OffRoller();
-  //Skills();
+  // Skills();
   // OnRoller();
   oldOffRoller();
   // if(autonswitch.value(percent)<25){
@@ -103,6 +103,7 @@ void autonomous(void) {
   // }else{
   //   Skills();
   // }
+  // rollToColor();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -127,6 +128,7 @@ void usercontrol(void) {
        counter ++;
      }
      task runPID(FlyWheelPIDRPM); 
+     Flap.set(true);
    }
   
   expandTimer.reset();
@@ -138,14 +140,13 @@ void usercontrol(void) {
     }
 
     if(Controller1.ButtonRight.pressing()){
-      //volts = 9.5;
       powerLevel++;
       waitUntil(!Controller1.ButtonRight.pressing());
     }
   
     if(Controller1.ButtonLeft.pressing()){
       powerLevel--;
-      Flywheel.spin(forward, 2030 + (75*powerLevel), rpm);
+      //Flywheel.spin(forward, 2030 + (75*powerLevel), rpm);
       waitUntil(!Controller1.ButtonLeft.pressing());
     }
 
@@ -181,42 +182,25 @@ void usercontrol(void) {
       Intake.stop(coast);
     }
 
-    /*if(Controller1.ButtonL2.pressing()){
-      thread roll(rollToColor);
-      waitUntil(!Controller1.ButtonL2.pressing());
-    }
-    */
+    // if(Controller1.ButtonL2.pressing()){
+    //   thread roll(rollToColor);
+    //   waitUntil(!Controller1.ButtonL2.pressing());
+    // }
+    
 
-    //Controller1.ButtonR1.pressed(shoot);
-    // if(Controller1.ButtonB.pressing()){
-    //   autoshoot(-10);
-    //   waitUntil(!Controller1.ButtonR2.pressing());
-    // }
-    // if(Controller1.ButtonX.pressing()){
-    //   if(toggleAutoSpeed){
-    //     toggleAutoSpeed = false;
-    //   }else{
-    //     toggleAutoSpeed = true;
-    //   }
-    //   waitUntil(!Controller1.ButtonX.pressing());
-    // }
     if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
       Expansion.set(true);
     }
 
-    /*if(Controller1.ButtonY.pressing()){
-      Expansion.set(true);
-    }
-
-    if(Controller1.ButtonX.pressing()){
-      const int targetX = 162;
-      turn(Inertial.yaw() - (0.25 * (targetX-centerX)));
-    }*/
+    // if(Controller1.ButtonX.pressing()){
+    //   const int targetX = 162;
+    //   turn(Inertial.yaw() - (0.25 * (targetX-centerX)));
+    // }
 
     if(Controller1.ButtonL1.pressing()){
       if(Flap.value()){
         Flap.set(false);
-        powerLevel = 8;
+        //powerLevel = 8;
         waitUntil(!Controller1.ButtonL1.pressing());
       } else {
         Flap.set(true);
@@ -227,17 +211,6 @@ void usercontrol(void) {
       }
     }
 
-   /* if(Controller1.ButtonUp.pressing()){
-      powerLevel = 3;
-      Flap.set(true);
-      waitUntil(!Controller1.ButtonDown.pressing());
-    }
-
-    if(Controller1.ButtonDown.pressing()){
-      Flap.set(false);
-      powerLevel = 6.3;
-      waitUntil(!Controller1.ButtonDown.pressing());
-    }*/
 
     Controller1.Screen.setCursor(1, 1);
     // Brain.Screen.clearScreen();
