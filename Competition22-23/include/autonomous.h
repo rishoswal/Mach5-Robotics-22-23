@@ -19,7 +19,7 @@ void Skills(){
   wait(0.2, sec);
   cosdrive(-10, 33);
   Intake.stop();
-  fullDrive.spinFor(reverse, 0.4, sec, 20, rpm);
+  fullDrive.spinFor(reverse, 0.25, sec, 20, rpm);
   fullDrive.stop(hold);
   wait(0.15, sec);
   rollRed();
@@ -79,7 +79,7 @@ void Skills(){
   cosdrive(71, 87);
   rotateSpeed = 2300;
   Flap.set(true);
-  turn(-197.5);
+  turn(-198.5);
   tripleshot();
 
   enableFlyPID = false;

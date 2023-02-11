@@ -102,7 +102,7 @@ Discarded input sections
  .ARM.exidx.text._Z7rollRedv
                 0x00000000        0x8 build/src/main.o
  .text._Z6Skillsv
-                0x00000000      0x6c0 build/src/main.o
+                0x00000000      0x6c8 build/src/main.o
  .ARM.exidx.text._Z6Skillsv
                 0x00000000        0x8 build/src/main.o
  .text._Z11oldOnRollerv
