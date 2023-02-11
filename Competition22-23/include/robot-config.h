@@ -32,7 +32,7 @@ extern signature goalCam__SIG_7;
 extern vision goalCam;
 extern digital_out Expansion;
 extern optical rollerColor;
-extern potV2 colorSwitch;
+extern potV2 codeSwitch;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

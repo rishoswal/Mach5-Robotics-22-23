@@ -30,7 +30,7 @@
 // goalCam              vision        4               
 // Expansion            digital_out   B               
 // rollerColor          optical       8               
-// colorSwitch          potV2         G               
+// codeSwitch           potV2         G               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -72,6 +72,12 @@ void pre_auton(void) {
   right2.setBrake(coast);
   right3.setBrake(coast);
 
+  Brain.Screen.setFont(mono60);
+  while(true){
+    codeSwitch.changed(displayCode);
+    wait(0.3, sec);
+  }
+
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -88,22 +94,17 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  //thread startOdom(odometryInertial);
-  //Win();
-  //OffRoller();
-  // Skills();
-  // OnRoller();
-  oldOffRoller();
-  // if(autonswitch.value(percent)<25){
-  //   OffRoller();
-  // }else if(autonswitch.value(percent)<50){
-  //   OnRoller();
-  // }else if(autonswitch.value(percent)<75){
-  //   FullWin();
-  // }else{
-  //   Skills();
-  // }
-  // rollToColor();
+  if(codeSwitch.angle(degrees) < 72){
+    Skills();
+  }else if(codeSwitch.angle(degrees) < 144){
+    OffRoller();
+  }else if(codeSwitch.angle(degrees) < 216){
+    OnRoller();
+  }else if(codeSwitch.angle(degrees) < 288){
+    OffRoller();
+  }else{
+    OnRoller();
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -120,6 +121,7 @@ void usercontrol(void) {
   // User control code here, inside the loop
   //Blocker.set(true);
   //thread startOdom(odometryInertial);
+  Brain.Screen.setFont(mono20);
   thread viewVision(visionAim);
 
    if(Controller1.Axis4.position()<50){
@@ -188,7 +190,15 @@ void usercontrol(void) {
     // }
     
 
-    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
+    if(Controller1.ButtonY.pressing()){
+      if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 55){
+        Expansion.set(true);
+      }else if(expandTimer.time(sec) > 95){
+        Expansion.set(true);
+      }
+    }
+
+    if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 59.5){
       Expansion.set(true);
     }
 
@@ -200,7 +210,9 @@ void usercontrol(void) {
     if(Controller1.ButtonL1.pressing()){
       if(Flap.value()){
         Flap.set(false);
-        //powerLevel = 8;
+        if(codeSwitch.angle(degrees) > 72){
+          powerLevel = 8;
+        }
         waitUntil(!Controller1.ButtonL1.pressing());
       } else {
         Flap.set(true);
@@ -211,7 +223,7 @@ void usercontrol(void) {
       }
     }
 
-
+    //codeSwitch.changed(displayCode);
     Controller1.Screen.setCursor(1, 1);
     // Brain.Screen.clearScreen();
     //  Brain.Screen.printAt(15, 20, "Hue: %f", rollerColor.hue());

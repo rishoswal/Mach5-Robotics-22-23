@@ -37,7 +37,7 @@ vision goalCam = vision (PORT4, 150, goalCam__REDGOAL, goalCam__BLUEGOAL, goalCa
 /*vex-vision-config:end*/
 digital_out Expansion = digital_out(Brain.ThreeWirePort.B);
 optical rollerColor = optical(PORT8);
-potV2 colorSwitch = potV2(Brain.ThreeWirePort.G);
+potV2 codeSwitch = potV2(Brain.ThreeWirePort.G);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

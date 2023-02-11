@@ -127,7 +127,7 @@ int FlyWheelPIDRPM() {
   while (enableFlyPID) {
     if(toggleAutoSpeed == false){
       diff = 0;
-      error = Flywheel.velocity(rpm)*6 - (rotateSpeed-(rotateSpeed*0.1));
+      error = Flywheel.velocity(rpm)*6 - (rotateSpeed*0.9);
       derivative = error - prevError;
       // Brain.Screen.print(Flywheel.velocity(rpm)*6);
       // Brain.Screen.clearLine();
@@ -267,7 +267,7 @@ void rollToColor(){
   if(rollerColor.isNearObject()){
     autospinning = true;
     rollTimer.reset();
-    if(colorSwitch.value(percent) < 50){
+    if(codeSwitch.angle(degrees) < 216){
       while(rollerColor.hue() > 300 || rollerColor.hue() < 100){
         Intake.spin(forward, 90, percent);
         if(rollTimer.time(sec) > 2){
@@ -305,11 +305,11 @@ void visionAim(){
   float goalDistance;
 
   while(true){
-    Brain.Screen.clearScreen();
-    Brain.Screen.setOrigin(1, 1);
-    Brain.Screen.drawRectangle(0, 0, 316, 212);
+    // Brain.Screen.clearScreen();
+    // Brain.Screen.setOrigin(1, 1);
+    // Brain.Screen.drawRectangle(0, 0, 316, 212);
 
-    if(colorSwitch.value(percent)<50){
+    if(codeSwitch.value(percent)<50){
       goalCam.takeSnapshot(goalCam__REDGOAL);
     }else{
       goalCam.takeSnapshot(goalCam__BLUEGOAL);
@@ -321,23 +321,42 @@ void visionAim(){
         higherObject = 1;
       }
       higherObject = goalCam.objects[0].centerY > goalCam.objects[1].centerY;
-      Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
-      Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
+      // Brain.Screen.drawRectangle(goalCam.objects[higherObject].originX, goalCam.objects[higherObject].originY, goalCam.objects[higherObject].width, goalCam.objects[higherObject].height, color::red);
+      // Brain.Screen.drawRectangle(goalCam.objects[!higherObject].originX, goalCam.objects[!higherObject].originY, goalCam.objects[!higherObject].width, goalCam.objects[!higherObject].height, color::purple);
     }else{
       higherObject = 0;
-      Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
+      // Brain.Screen.drawRectangle(goalCam.objects[0].originX, goalCam.objects[0].originY, goalCam.objects[0].width, goalCam.objects[0].height, color::red);
     }
 
     // https://www.desmos.com/calculator/imonsqlj9j calculate distance
     goalDistance = 5.3 * pow(1.0125, (goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height)) + 4;
     centerX = goalCam.objects[higherObject].centerX;
 
-    Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
-    Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
-    Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
-    Brain.Screen.printAt(320, 65, "center X: %d", centerX);
-    Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
+    // Brain.Screen.printAt(320, 20, "bottom y: %d", goalCam.objects[higherObject].originY + goalCam.objects[higherObject].height);
+    // Brain.Screen.printAt(320, 35, "center y: %d", goalCam.objects[higherObject].centerY);
+    // Brain.Screen.printAt(320, 50, "distance: %f", goalDistance);
+    // Brain.Screen.printAt(320, 65, "center X: %d", centerX);
+    // Brain.Screen.printAt(320, 80, "heading: %f", Inertial.yaw());
 
     wait(0.2, sec);
+  }
+}
+
+void displayCode(){
+  if(codeSwitch.angle(degrees) < 72){
+    Brain.Screen.drawRectangle(0, 0, 480, 272, red);
+    Brain.Screen.printAt(200, 136, "Skills%s");
+  }else if(codeSwitch.angle(degrees) < 144){
+    Brain.Screen.drawRectangle(0, 0, 480, 272, red);
+    Brain.Screen.printAt(200, 136, "Off Roller%s");
+  }else if(codeSwitch.angle(degrees) < 216){
+    Brain.Screen.drawRectangle(0, 0, 480, 272, red);
+    Brain.Screen.printAt(200, 136, "On Roller%s");
+  }else if(codeSwitch.angle(degrees) < 288){
+    Brain.Screen.drawRectangle(0, 0, 480, 272, blue);
+    Brain.Screen.printAt(200, 136, "Off Roller%s");
+  }else{
+    Brain.Screen.drawRectangle(0, 0, 480, 272, blue);
+    Brain.Screen.printAt(200, 136, "On Roller%s");
   }
 }
