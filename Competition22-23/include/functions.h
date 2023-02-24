@@ -250,7 +250,7 @@ void rollRed(){
     autospinning = true;
     if(rollerColor.hue() > 300 or rollerColor.hue() < 200){
       while(rollerColor.hue() > 300 or rollerColor.hue() < 100){
-        if(rollTimer.value() > 2.5){
+        if(rollTimer.value() > 2){
           Brain.Screen.print("3 sec");
           break;
 

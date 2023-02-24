@@ -94,7 +94,8 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  if(codeSwitch.angle(degrees) < 72){
+  // Uncomment for competition
+  /*if(codeSwitch.angle(degrees) < 72){
     Skills();
   }else if(codeSwitch.angle(degrees) < 144){
     OffRoller();
@@ -104,7 +105,9 @@ void autonomous(void) {
     OffRoller();
   }else{
     OnRoller();
-  }
+  }*/
+  NewSkills();
+  //Skills();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -190,17 +193,17 @@ void usercontrol(void) {
     // }
     
 
-    if(Controller1.ButtonY.pressing()){
-      if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 55){
-        Expansion.set(true);
-      }else if(expandTimer.time(sec) > 95){
-        Expansion.set(true);
-      }
+    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
+      //if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 55){
+      Expansion.set(true);
+      //}else if(expandTimer.time(sec) > 95){
+      //  Expansion.set(true);
+      //}
     }
 
-    if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 59.5){
+    /*if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 50){
       Expansion.set(true);
-    }
+    }*/
 
     // if(Controller1.ButtonX.pressing()){
     //   const int targetX = 162;
