@@ -106,7 +106,7 @@ void autonomous(void) {
   }else{
     OnRoller();
   }*/
-  NewSkills();
+  Skills();
   //Skills();
 }
 

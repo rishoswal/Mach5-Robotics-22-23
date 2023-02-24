@@ -288,16 +288,15 @@ void rollToColor(){
 }
 
 void tripleshot(){
-  Intake.spinFor(reverse, 0.5, sec, 140, rpm);
+  Intake.spinFor(reverse, 0.5, sec, 145, rpm);
   rotateSpeed = 3800;
-  wait(0.19, sec);
-  Intake.spinFor(reverse, 1.5, sec, 135, rpm);
+  wait(0.13, sec);
+  Intake.spinFor(reverse, 1.5, sec, 155, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 1000, rpm);
   wait(0.2, sec);
-  rotateSpeed = 2375;
+  rotateSpeed = 2275;
 }
-
 
 int centerX;
 void visionAim(){
