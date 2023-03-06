@@ -175,7 +175,7 @@ void Skills(){
 
   wait(0.2, seconds);
   
-  cosdrive(23, 50);
+  cosdrive(21, 50);
   turn(-180);
   cosdrive(-23, 50);
   fullDrive.spinFor(reverse, 0.3, sec, 25, rpm);

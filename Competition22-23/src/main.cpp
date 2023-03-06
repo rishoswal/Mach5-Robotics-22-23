@@ -18,7 +18,7 @@
 // right1               motor         16              
 // right2               motor         17              
 // right3               motor         12              
-// Intake               motor         10              
+// Intake               motor         7               
 // Inertial             inertial      3               
 // expander             triport       5               
 // LeftExpansion        digital_out   E               
@@ -95,7 +95,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // Uncomment for competition
-  /*if(codeSwitch.angle(degrees) < 72){
+  if(codeSwitch.angle(degrees) < 72){
     Skills();
   }else if(codeSwitch.angle(degrees) < 144){
     OffRoller();
@@ -105,8 +105,8 @@ void autonomous(void) {
     OffRoller();
   }else{
     OnRoller();
-  }*/
-  Skills();
+  }
+  //Skills();
   //Skills();
 }
 
@@ -193,7 +193,7 @@ void usercontrol(void) {
     // }
     
 
-    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 95){
+    if(Controller1.ButtonY.pressing() && expandTimer.time(sec) > 50){
       //if(codeSwitch.angle(degrees) < 72 and expandTimer.time(sec) > 55){
       Expansion.set(true);
       //}else if(expandTimer.time(sec) > 95){
