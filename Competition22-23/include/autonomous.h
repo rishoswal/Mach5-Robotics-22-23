@@ -21,8 +21,8 @@ void NewSkills(){
   turn(88.5);
   //wait(0.2, sec);
   cosdrive(-12, 33);
-  Intake.stop();
-  fullDrive.spinFor(reverse, 0.3, sec, 20, rpm);
+  Intake.stop(); 
+  fullDrive.spinFor(reverse, 0.25, sec, 20, rpm);
   fullDrive.stop(hold);
   //wait(0.15, sec);
   rollRed();
@@ -153,14 +153,14 @@ void Skills(){
   enableFlyPID = false;
   Flywheel.stop();
   
-  cosdrive(-6.75, 10);
+  cosdrive(-5.5, 10);
   turn(85.5);
   Intake.spin(forward, 100, percent);
-  cosdrive(99, 57);
+  cosdrive(100, 57);
   turn(2);
   wait(0.1, sec);
   turn(2);
-  cosdrive(59.5, 65);
+  cosdrive(61, 65);
   wait(0.3, sec);
   cosdrive(-16, 30);
   turn(-90);

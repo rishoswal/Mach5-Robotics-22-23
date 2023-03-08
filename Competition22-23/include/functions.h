@@ -95,9 +95,9 @@ int currSpeed;
 bool enableLogistic = true;
 bool enableFlyPID = false;
 
-double kP = 0.03;
+double kP = 0.02;
 double kI = 0.0;
-double kD = 0.0035;
+double kD = 0.0075;
 
 bool toggleAutoSpeed = false;
 
@@ -290,7 +290,7 @@ void rollToColor(){
 void tripleshot(){
   Intake.spinFor(reverse, 0.5, sec, 145, rpm);
   rotateSpeed = 3800;
-  wait(0.13, sec);
+  wait(0.05, sec);
   Intake.spinFor(reverse, 1.5, sec, 155, rpm);
   //wait(0.2, sec);
   Flywheel.spin(forward, 1000, rpm);
